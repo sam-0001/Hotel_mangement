@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Nav from '../components/NaV.JSX';
+import Nav from '../components/Nav.jsx';
 import { FaLocationDot, FaStore } from "react-icons/fa6";
 import { FaBuilding } from "react-icons/fa";
 
