@@ -96,8 +96,9 @@ export const getItemByCity = async (req, res) => {
         const { city } = req.params
 
         let query = {};
-        if (city && city !== "null" && city !== "undefined") {
-            query.city = { $regex: new RegExp(`^${city}$`, "i") };
+        if (city && city !== "null" && city !== "undefined" && city !== "All") {
+            const firstWord = city.split(" ")[0];
+            query.city = { $regex: new RegExp(firstWord, "i") };
         }
 
         const shops = await Shop.find(query).populate('items')
@@ -135,9 +136,16 @@ export const searchItems=async (req,res) => {
         if(!query || !city){
             return null
         }
-        const shops=await Shop.find({
-            city:{$regex:new RegExp(`^${city}$`, "i")}
-        }).populate('items')
+        let queryCity = {};
+        if (city && city !== "null" && city !== "undefined" && city !== "All") {
+            const firstWord = city.split(" ")[0];
+            queryCity = { city: { $regex: new RegExp(firstWord, "i") } };
+        } else {
+            // If city is All or null, don't filter by city
+            queryCity = {};
+        }
+        
+        const shops=await Shop.find(queryCity).populate('items')
         if(!shops){
             return res.status(400).json({message:"shops not found"})
         }

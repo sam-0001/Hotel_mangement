@@ -47,8 +47,9 @@ export const getShopByCity=async (req,res) => {
         const {city}=req.params
 
         let query = {};
-        if (city && city !== "null" && city !== "undefined") {
-            query.city = {$regex:new RegExp(`^${city}$`, "i")};
+        if (city && city !== "null" && city !== "undefined" && city !== "All") {
+            const firstWord = city.split(" ")[0];
+            query.city = {$regex:new RegExp(firstWord, "i")};
         }
 
         const shops=await Shop.find(query).populate('items')
