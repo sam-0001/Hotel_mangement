@@ -10,6 +10,7 @@ import { setSearchItems, setUserData } from '../redux/userSlice';
 import { FaPlus } from "react-icons/fa6";
 import { TbReceipt2 } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png';
 function Nav() {
     const { userData, currentCity ,cartItems} = useSelector(state => state.user)
         const { myShopData} = useSelector(state => state.owner)
@@ -45,7 +46,9 @@ handleSearchItems()
 
     },[query])
     return (
-        <div className='w-full h-[80px] flex items-center justify-between md:justify-center gap-[30px] px-[20px] fixed top-0 z-[9999] bg-[#fff9f6] overflow-visible'>
+        <div className='w-full h-[80px] flex justify-center fixed top-0 z-[9999] bg-[#fff9f6] overflow-visible shadow-sm'>
+            <div className='w-full max-w-6xl h-full flex items-center justify-between gap-[10px] md:gap-[30px] px-[10px]'>
+
 
             {showSearch && userData.role == "user" && <div className='w-[90%] h-[70px]  bg-white shadow-xl rounded-lg items-center gap-[20px] flex fixed top-[80px] left-[5%] md:hidden'>
                 <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-400'>
@@ -60,7 +63,9 @@ handleSearchItems()
 
 
 
-            <h1 className='text-3xl font-bold mb-2 text-[#ff4d2d]'>Vingo</h1>
+            <div className="flex items-center justify-center shrink-0">
+                <img src={logo} alt="The Hometown Kitchen n cafe Restaurant" className="h-[70px] md:h-[80px] w-auto cursor-pointer object-contain scale-[1.5] origin-left" onClick={() => navigate("/")} />
+            </div>
             {userData.role == "user" && <div className='md:w-[60%] lg:w-[40%] h-[70px] bg-white shadow-xl rounded-lg items-center gap-[20px] hidden md:flex'>
                 <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-400'>
                     <FaLocationDot size={25} className=" text-[#ff4d2d]" />
@@ -87,11 +92,11 @@ handleSearchItems()
                     <div className='hidden md:flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium' onClick={()=>navigate("/my-orders")}>
                       <TbReceipt2 size={20}/>
                       <span>My Orders</span>
-                      <span className='absolute -right-2 -top-2 text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[6px] py-[1px]'>0</span>
+                      
                     </div>
                      <div className='md:hidden flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium' onClick={()=>navigate("/my-orders")}>
                       <TbReceipt2 size={20}/>
-                      <span className='absolute -right-2 -top-2 text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[6px] py-[1px]'>0</span>
+                      
                     </div>
                 </>: (
                     <>
@@ -101,6 +106,16 @@ handleSearchItems()
                 </div>}   
            
 
+                {userData.role == "user" && (
+                    <div className='hidden lg:flex items-center gap-4'>
+                        <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={()=>navigate("/dine-in")}>
+                            Book Table
+                        </button>
+                        <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={()=>navigate("/halls")}>
+                            Book Hall
+                        </button>
+                    </div>
+                )}
 
                 <button className='hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium' onClick={()=>navigate("/my-orders")}>
                     My Orders
@@ -117,10 +132,12 @@ handleSearchItems()
                     ${userData.role=="deliveryBoy"?"md:right-[20%] lg:right-[40%]":"md:right-[10%] lg:right-[25%]"} w-[180px] bg-white shadow-2xl rounded-xl p-[20px] flex flex-col gap-[10px] z-[9999]`}>
                     <div className='text-[17px] font-semibold'>{userData.fullName}</div>
                     {userData.role=="user" && <div className='md:hidden text-[#ff4d2d] font-semibold cursor-pointer' onClick={()=>navigate("/my-orders")}>My Orders</div>}
-                    
+                    {userData.role=="user" && <div className='lg:hidden text-gray-700 font-semibold cursor-pointer hover:text-[#ff4d2d]' onClick={()=>navigate("/dine-in")}>Book Table</div>}
+                    {userData.role=="user" && <div className='lg:hidden text-gray-700 font-semibold cursor-pointer hover:text-[#ff4d2d]' onClick={()=>navigate("/halls")}>Book Hall</div>}
                     <div className='text-[#ff4d2d] font-semibold cursor-pointer' onClick={handleLogOut}>Log Out</div>
                 </div>}
 
+            </div>
             </div>
         </div>
     )

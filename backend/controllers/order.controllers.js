@@ -5,6 +5,7 @@ import User from "../models/user.model.js"
 import { sendDeliveryOtpMail } from "../utils/mail.js"
 import RazorPay from "razorpay"
 import dotenv from "dotenv"
+import { count } from "console"
 
 dotenv.config()
 let instance = new RazorPay({
@@ -14,12 +15,16 @@ let instance = new RazorPay({
 
 export const placeOrder = async (req, res) => {
     try {
-        const { cartItems, paymentMethod, deliveryAddress, totalAmount } = req.body
-        if (cartItems.length == 0 || !cartItems) {
+        console.log("placeOrder called with body:", req.body);
+        const { cartItems, paymentMethod, deliveryAddress, totalAmount, orderType, tableId } = req.body
+        if (!cartItems || cartItems.length == 0) {
             return res.status(400).json({ message: "cart is empty" })
         }
-        if (!deliveryAddress.text || !deliveryAddress.latitude || !deliveryAddress.longitude) {
-            return res.status(400).json({ message: "send complete deliveryAddress" })
+        
+        if (orderType !== "dineIn") {
+            if (!deliveryAddress || !deliveryAddress.text || !deliveryAddress.latitude || !deliveryAddress.longitude) {
+                return res.status(400).json({ message: "send complete deliveryAddress" })
+            }
         }
 
         const groupItemsByShop = {}
@@ -62,7 +67,9 @@ export const placeOrder = async (req, res) => {
             const newOrder = await Order.create({
                 user: req.userId,
                 paymentMethod,
-                deliveryAddress,
+                deliveryAddress: orderType === "dineIn" ? undefined : deliveryAddress,
+                orderType,
+                tableId,
                 totalAmount,
                 shopOrders,
                 razorpayOrderId: razorOrder.id,
@@ -79,7 +86,9 @@ export const placeOrder = async (req, res) => {
         const newOrder = await Order.create({
             user: req.userId,
             paymentMethod,
-            deliveryAddress,
+            deliveryAddress: orderType === "dineIn" ? undefined : deliveryAddress,
+            orderType,
+            tableId,
             totalAmount,
             shopOrders
         })
@@ -102,6 +111,8 @@ export const placeOrder = async (req, res) => {
                         shopOrders: shopOrder,
                         createdAt: newOrder.createdAt,
                         deliveryAddress: newOrder.deliveryAddress,
+                        orderType: newOrder.orderType,
+                        tableId: newOrder.tableId,
                         payment: newOrder.payment
                     })
                 }
@@ -112,6 +123,7 @@ export const placeOrder = async (req, res) => {
 
         return res.status(201).json(newOrder)
     } catch (error) {
+        console.error("placeOrder caught error:", error);
         return res.status(500).json({ message: `place order error ${error}` })
     }
 }
@@ -150,6 +162,8 @@ export const verifyPayment = async (req, res) => {
                         shopOrders: shopOrder,
                         createdAt: order.createdAt,
                         deliveryAddress: order.deliveryAddress,
+                        orderType: order.orderType,
+                        tableId: order.tableId,
                         payment: order.payment
                     })
                 }
@@ -175,6 +189,7 @@ export const getMyOrders = async (req, res) => {
                 .populate("shopOrders.shop", "name")
                 .populate("shopOrders.owner", "name email mobile")
                 .populate("shopOrders.shopOrderItems.item", "name image price")
+                .populate("tableId", "tableNumber")
 
             return res.status(200).json(orders)
         } else if (user.role == "owner") {
@@ -184,6 +199,7 @@ export const getMyOrders = async (req, res) => {
                 .populate("user")
                 .populate("shopOrders.shopOrderItems.item", "name image price")
                 .populate("shopOrders.assignedDeliveryBoy", "fullName mobile")
+                .populate("tableId", "tableNumber")
 
 
 
@@ -532,7 +548,53 @@ export const verifyDeliveryOtp = async (req, res) => {
     }
 }
 
+export const getTodayDeliveries=async (req,res) => {
+    try {
+        const deliveryBoyId=req.userId
+        const startsOfDay=new Date()
+        startsOfDay.setHours(0,0,0,0)
 
+        const orders=await Order.find({
+           "shopOrders.assignedDeliveryBoy":deliveryBoyId,
+           "shopOrders.status":"delivered",
+           "shopOrders.deliveredAt":{$gte:startsOfDay}
+        }).lean()
+
+     let todaysDeliveries=[] 
+     
+     orders.forEach(order=>{
+        order.shopOrders.forEach(shopOrder=>{
+            if(shopOrder.assignedDeliveryBoy==deliveryBoyId &&
+                shopOrder.status=="delivered" &&
+                shopOrder.deliveredAt &&
+                shopOrder.deliveredAt>=startsOfDay
+            ){
+                todaysDeliveries.push(shopOrder)
+            }
+        })
+     })
+
+let stats={}
+
+todaysDeliveries.forEach(shopOrder=>{
+    const hour=new Date(shopOrder.deliveredAt).getHours()
+    stats[hour]=(stats[hour] || 0) + 1
+})
+
+let formattedStats=Object.keys(stats).map(hour=>({
+ hour:parseInt(hour),
+ count:stats[hour]   
+}))
+
+formattedStats.sort((a,b)=>a.hour-b.hour)
+
+return res.status(200).json(formattedStats)
+  
+
+    } catch (error) {
+        return res.status(500).json({ message: `today deliveries error ${error}` }) 
+    }
+}
 
 
 

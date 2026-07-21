@@ -33,8 +33,16 @@ const dispatch=useDispatch()
             </div>
 
             <div className='flex items-start flex-col gap-2 text-gray-600 text-sm'>
-                <p>{data?.deliveryAddress?.text}</p>
-                <p className='text-xs text-gray-500'>Lat: {data?.deliveryAddress.latitude} , Lon {data?.deliveryAddress.longitude}</p>
+                {data?.orderType === 'dineIn' ? (
+                    <div className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg font-bold w-full">
+                        Dine-In Order: Table {data.tableId?.tableNumber || "Assigned"}
+                    </div>
+                ) : (
+                    <>
+                        <p>{data?.deliveryAddress?.text}</p>
+                        <p className='text-xs text-gray-500'>Lat: {data?.deliveryAddress?.latitude} , Lon {data?.deliveryAddress?.longitude}</p>
+                    </>
+                )}
             </div>
 
             <div className='flex space-x-4 overflow-x-auto pb-2'>
@@ -53,9 +61,13 @@ const dispatch=useDispatch()
 
 <select  className='rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 border-[#ff4d2d] text-[#ff4d2d]' onChange={(e)=>handleUpdateStatus(data._id,data.shopOrders.shop._id,e.target.value)}>
     <option value="">Change</option>
-<option value="pending">Pending</option>
-<option value="preparing">Preparing</option>
-<option value="out of delivery">Out Of Delivery</option>
+    <option value="pending">Pending</option>
+    <option value="preparing">Preparing</option>
+    {data?.orderType === 'dineIn' ? (
+        <option value="delivered">Served</option>
+    ) : (
+        <option value="out of delivery">Out Of Delivery</option>
+    )}
 </select>
 
 </div>

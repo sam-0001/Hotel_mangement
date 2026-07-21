@@ -8,7 +8,11 @@ const shopOrderItemSchema = new mongoose.Schema({
     },
     name:String,
     price:Number,
-    quantity:Number
+    quantity:Number,
+    isRated: {
+        type: Boolean,
+        default: false
+    }
 }, { timestamps: true })
 
 const shopOrderSchema = new mongoose.Schema({
@@ -60,6 +64,16 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['cod', "online"],
         required: true
+    },
+    orderType: {
+        type: String,
+        enum: ['delivery', 'dineIn'],
+        default: 'delivery'
+    },
+    tableId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Table",
+        default: null
     },
     deliveryAddress: {
         text: String,

@@ -19,7 +19,7 @@ function UserOrderCard({ data }) {
 
     const handleRating = async (itemId, rating) => {
         try {
-            const result = await axios.post(`${serverUrl}/api/item/rating`, { itemId, rating }, { withCredentials: true })
+            const result = await axios.post(`${serverUrl}/api/item/rating`, { orderId: data._id, itemId, rating }, { withCredentials: true })
             setSelectedRating(prev => ({
                 ...prev, [itemId]: rating
             }))
@@ -27,7 +27,6 @@ function UserOrderCard({ data }) {
             console.log(error)
         }
     }
-
 
     return (
         <div className='bg-white rounded-lg shadow p-4 space-y-4'>
@@ -47,22 +46,31 @@ function UserOrderCard({ data }) {
                 </div>
             </div>
 
+            <div className='bg-gray-50 p-3 rounded-lg text-sm text-gray-700'>
+                {data?.orderType === 'dineIn' ? (
+                    <p className="font-bold text-orange-800">Dine-In Order: Table {data.tableId?.tableNumber || "Assigned"}</p>
+                ) : (
+                    <p><strong>Delivery Address:</strong> {data?.deliveryAddress?.text}</p>
+                )}
+            </div>
+
             {data.shopOrders.map((shopOrder, index) => (
                 <div className='"border rounded-lg p-3 bg-[#fffaf7] space-y-3' key={index}>
                     <p>{shopOrder.shop.name}</p>
 
                     <div className='flex space-x-4 overflow-x-auto pb-2'>
-                        {shopOrder.shopOrderItems.map((item, index) => (
-                            <div key={index} className='flex-shrink-0 w-40 border rounded-lg p-2 bg-white"'>
-                                <img src={item.item.image} alt="" className='w-full h-24 object-cover rounded' />
+                        {shopOrder.shopOrderItems.map((item, idx) => (
+                            <div key={idx} className='flex-shrink-0 w-40 border rounded-lg p-2 bg-white"'>
+                                <img src={item.item?.image || item.image} alt="" className='w-full h-24 object-cover rounded' />
                                 <p className='text-sm font-semibold mt-1'>{item.name}</p>
                                 <p className='text-xs text-gray-500'>Qty: {item.quantity} x ₹{item.price}</p>
 
-                                {shopOrder.status == "delivered" && <div className='flex space-x-1 mt-2'>
+                                {shopOrder.status == "delivered" && !item.isRated && !selectedRating[item.item?._id || item.item] && <div className='flex space-x-1 mt-2'>
                                     {[1, 2, 3, 4, 5].map((star) => (
-                                        <button className={`text-lg ${selectedRating[item.item._id] >= star ? 'text-yellow-400' : 'text-gray-400'}`} onClick={() => handleRating(item.item._id,star)}>★</button>
+                                        <button key={star} className={`text-lg text-gray-300 hover:text-yellow-400`} onClick={() => handleRating(item.item?._id || item.item,star)}>★</button>
                                     ))}
                                 </div>}
+                                {(item.isRated || selectedRating[item.item?._id || item.item]) && <p className='text-xs text-green-600 mt-2 font-bold'>Thanks for rating!</p>}
 
 
 

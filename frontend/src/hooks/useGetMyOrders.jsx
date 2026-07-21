@@ -11,6 +11,7 @@ function useGetMyOrders() {
   useEffect(()=>{
   const fetchOrders=async () => {
     try {
+        if (!userData || !userData._id) return;
            const result=await axios.get(`${serverUrl}/api/order/my-orders`,{withCredentials:true})
             dispatch(setMyOrders(result.data))
    

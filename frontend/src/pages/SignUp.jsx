@@ -11,13 +11,13 @@ import { auth } from '../../firebase';
 import { ClipLoader } from "react-spinners"
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
-function SignUp() {
+import logo from '../assets/logo.png';
+function SignUp({ role = "user" }) {
     const primaryColor = "#ff4d2d";
     const hoverColor = "#e64323";
     const bgColor = "#fff9f6";
     const borderColor = "#ddd";
     const [showPassword, setShowPassword] = useState(false)
-    const [role, setRole] = useState("user")
     const navigate=useNavigate()
     const [fullName,setFullName]=useState("")
     const [email,setEmail]=useState("")
@@ -61,10 +61,13 @@ function SignUp() {
      }
     return (
         <div className='min-h-screen w-full flex items-center justify-center p-4' style={{ backgroundColor: bgColor }}>
-            <div className={`bg-white rounded-xl shadow-lg w-full max-w-md p-8 border-[1px] `} style={{
+            <div className={`bg-white rounded-xl shadow-lg w-full max-w-md px-8 pb-8 pt-4 border-[1px] `} style={{
                 border: `1px solid ${borderColor}`
             }}>
-                <h1 className={`text-3xl font-bold mb-2 `} style={{ color: primaryColor }}>Vingo</h1>
+                <div className="flex flex-col items-center justify-center w-full mb-4">
+                    <img src={logo} alt="The Hometown Kitchen n cafe Restaurant Logo" className="w-48 h-48 object-contain -mt-6 -mb-10" />
+                    <h1 className="text-xl md:text-2xl font-bold text-center" style={{ color: primaryColor }}>The Hometown Kitchen n cafe Restaurant</h1>
+                </div>
                 <p className='text-gray-600 mb-8'> Create your account to get started with delicious food deliveries
                 </p>
 
@@ -96,25 +99,7 @@ function SignUp() {
                         <button className='absolute right-3 cursor-pointer top-[14px] text-gray-500' onClick={() => setShowPassword(prev => !prev)}>{!showPassword ? <FaRegEye /> : <FaRegEyeSlash />}</button>
                     </div>
                 </div>
-                {/* role*/}
-
-                <div className='mb-4'>
-                    <label htmlFor="role" className='block text-gray-700 font-medium mb-1'>Role</label>
-                    <div className='flex gap-2'>
-                        {["user", "owner", "deliveryBoy"].map((r) => (
-                            <button
-                                className='flex-1 border rounded-lg px-3 py-2 text-center font-medium transition-colors cursor-pointer'
-                                onClick={()=>setRole(r)}
-                                style={
-                                   role==r?
-                                   {backgroundColor:primaryColor,color:"white"}
-                                   :{border:`1px solid ${primaryColor}`,color:primaryColor}
-                                }>
-                                {r}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                {/* role removed */}
 
             <button className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`} onClick={handleSignUp} disabled={loading}>
                 {loading?<ClipLoader size={20} color='white'/>:"Sign Up"}

@@ -9,10 +9,10 @@ export const signUp=async (req,res) => {
         if(user){
             return res.status(400).json({message:"User Already exist."})
         }
-        if(password.length<6){
+        if(!password || password.length<6){
             return res.status(400).json({message:"password must be at least 6 characters."})
         }
-        if(mobile.length<10){
+        if(!mobile || mobile.length<10){
             return res.status(400).json({message:"mobile no must be at least 10 digits."})
         }
      

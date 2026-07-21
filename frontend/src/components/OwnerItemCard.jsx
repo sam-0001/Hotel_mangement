@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React from 'react'
-import { FaPen } from "react-icons/fa";
+import { FaPen, FaStar, FaRegStar } from "react-icons/fa";
 import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../App';
@@ -27,6 +27,16 @@ function OwnerItemCard({data}) {
 <h2 className='text-base font-semibold text-[#ff4d2d]'>{data.name}</h2>
 <p><span className='font-medium text-gray-70'>Category:</span> {data.category}</p>
 <p><span className='font-medium text-gray-70'>Food Type:</span> {data.foodType}</p>
+<div className='flex items-center gap-1 mt-1'>
+  {[1, 2, 3, 4, 5].map((i) => (
+    i <= (data.rating?.average || 0) ? 
+      <FaStar key={i} className='text-yellow-500 text-sm'/> : 
+      <FaRegStar key={i} className='text-yellow-500 text-sm'/>
+  ))}
+  <span className='text-xs text-gray-500 ml-1'>
+    {(data.rating?.average || 0).toFixed(1)} / 5 ({data.rating?.count || 0} reviews)
+  </span>
+</div>
           </div>
           <div className='flex items-center justify-between'>
             <div className='text-[#ff4d2d] font-bold'>{data.price}</div>

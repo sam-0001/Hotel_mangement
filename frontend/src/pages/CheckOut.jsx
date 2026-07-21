@@ -31,7 +31,16 @@ function CheckOut() {
   const navigate=useNavigate()
   const dispatch = useDispatch()
   const apiKey = import.meta.env.VITE_GEOAPIKEY
-  const deliveryFee=totalAmount>500?0:40
+  const [dineInInfo, setDineInInfo] = useState(null)
+  
+  useEffect(() => {
+    const info = localStorage.getItem('dineInTable');
+    if (info) {
+      setDineInInfo(JSON.parse(info));
+    }
+  }, []);
+
+  const deliveryFee= (totalAmount>500 || dineInInfo) ? 0 : 40
   const AmountWithDeliveryFee=totalAmount+deliveryFee
 
 
@@ -75,16 +84,24 @@ function CheckOut() {
 
   const handlePlaceOrder=async () => {
     try {
-      const result=await axios.post(`${serverUrl}/api/order/place-order`,{
+      const payload = {
         paymentMethod,
-        deliveryAddress:{
-          text:addressInput,
-          latitude:location.lat,
-          longitude:location.lon
-        },
         totalAmount:AmountWithDeliveryFee,
-        cartItems
-      },{withCredentials:true})
+        cartItems,
+        orderType: dineInInfo ? "dineIn" : "delivery"
+      };
+
+      if (dineInInfo) {
+          payload.tableId = dineInInfo.tableId;
+      } else {
+          payload.deliveryAddress = {
+            text:addressInput,
+            latitude:location.lat,
+            longitude:location.lon
+          };
+      }
+
+      const result=await axios.post(`${serverUrl}/api/order/place-order`, payload, {withCredentials:true})
 
       if(paymentMethod=="cod"){
       dispatch(addMyOrder(result.data))
@@ -97,6 +114,7 @@ function CheckOut() {
     
     } catch (error) {
       console.log(error)
+      alert(error?.response?.data?.message || "Failed to place order. Please check your inputs or try again.");
     }
   }
 
@@ -106,7 +124,7 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
  key:import.meta.env.VITE_RAZORPAY_KEY_ID,
  amount:razorOrder.amount,
  currency:'INR',
- name:"Vingo",
+ name:"The Hometown Kitchen n cafe Restaurant",
  description:"Food Delivery Website",
  order_id:razorOrder.id,
  handler:async function (response) {
@@ -141,32 +159,39 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
       <div className='w-full max-w-[900px] bg-white rounded-2xl shadow-xl p-6 space-y-6'>
         <h1 className='text-2xl font-bold text-gray-800'>Checkout</h1>
 
-        <section>
-          <h2 className='text-lg font-semibold mb-2 flex items-center gap-2 text-gray-800'><IoLocationSharp className='text-[#ff4d2d]' /> Delivery Location</h2>
-          <div className='flex gap-2 mb-3'>
-            <input type="text" className='flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff4d2d]' placeholder='Enter Your Delivery Address..' value={addressInput} onChange={(e) => setAddressInput(e.target.value)} />
-            <button className='bg-[#ff4d2d] hover:bg-[#e64526] text-white px-3 py-2 rounded-lg flex items-center justify-center' onClick={getLatLngByAddress}><IoSearchOutline size={17} /></button>
-            <button className='bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center justify-center' onClick={getCurrentLocation}><TbCurrentLocation size={17} /></button>
-          </div>
-          <div className='rounded-xl border overflow-hidden'>
-            <div className='h-64 w-full flex items-center justify-center'>
-              <MapContainer
-                className={"w-full h-full"}
-                center={[location?.lat, location?.lon]}
-                zoom={16}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <RecenterMap location={location} />
-                <Marker position={[location?.lat, location?.lon]} draggable eventHandlers={{ dragend: onDragEnd }} />
-
-
-              </MapContainer>
+        {!dineInInfo ? (
+          <section>
+            <h2 className='text-lg font-semibold mb-2 flex items-center gap-2 text-gray-800'><IoLocationSharp className='text-[#ff4d2d]' /> Delivery Location</h2>
+            <div className='flex gap-2 mb-3'>
+              <input type="text" className='flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff4d2d]' placeholder='Enter Your Delivery Address..' value={addressInput} onChange={(e) => setAddressInput(e.target.value)} />
+              <button className='bg-[#ff4d2d] hover:bg-[#e64526] text-white px-3 py-2 rounded-lg flex items-center justify-center' onClick={getLatLngByAddress}><IoSearchOutline size={17} /></button>
+              <button className='bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center justify-center' onClick={getCurrentLocation}><TbCurrentLocation size={17} /></button>
             </div>
-          </div>
-        </section>
+            <div className='rounded-xl border overflow-hidden'>
+              <div className='h-64 w-full flex items-center justify-center'>
+                <MapContainer
+                  className={"w-full h-full"}
+                  center={location?.lat && location?.lon ? [location.lat, location.lon] : [28.6139, 77.2090]}
+                  zoom={16}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <RecenterMap location={location} />
+                  {location?.lat && location?.lon && (
+                    <Marker position={[location.lat, location.lon]} draggable eventHandlers={{ dragend: onDragEnd }} />
+                  )}
+                </MapContainer>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section className="bg-orange-50 border border-orange-200 p-6 rounded-xl text-center">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Dine-In Order</h2>
+            <p className="text-gray-600">Your food will be served directly to your table.</p>
+          </section>
+        )}
 
         <section>
           <h2 className='text-lg font-semibold mb-3 text-gray-800'>Payment Method</h2>

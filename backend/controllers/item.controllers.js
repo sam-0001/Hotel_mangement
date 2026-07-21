@@ -1,6 +1,7 @@
 import Item from "../models/item.model.js";
 import Shop from "../models/shop.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
+import Order from "../models/order.model.js";
 
 export const addItem = async (req, res) => {
     try {
@@ -93,12 +94,13 @@ export const deleteItem = async (req, res) => {
 export const getItemByCity = async (req, res) => {
     try {
         const { city } = req.params
-        if (!city) {
-            return res.status(400).json({ message: "city is required" })
+
+        let query = {};
+        if (city && city !== "null" && city !== "undefined") {
+            query.city = { $regex: new RegExp(`^${city}$`, "i") };
         }
-        const shops = await Shop.find({
-            city: { $regex: new RegExp(`^${city}$`, "i") }
-        }).populate('items')
+
+        const shops = await Shop.find(query).populate('items')
         if (!shops) {
             return res.status(400).json({ message: "shops not found" })
         }
@@ -159,14 +161,41 @@ export const searchItems=async (req,res) => {
 
 export const rating=async (req,res) => {
     try {
-        const {itemId,rating}=req.body
+        const {orderId, itemId,rating}=req.body
 
-        if(!itemId || !rating){
-            return res.status(400).json({message:"itemId and rating is required"})
+        if(!orderId || !itemId || !rating){
+            return res.status(400).json({message:"orderId, itemId and rating is required"})
         }
 
         if(rating<1 || rating>5){
              return res.status(400).json({message:"rating must be between 1 to 5"})
+        }
+
+        const order = await Order.findOne({ _id: orderId, user: req.userId });
+        if(!order) {
+             return res.status(404).json({message:"order not found or unauthorized"})
+        }
+
+        let orderItem = null;
+        let isDelivered = false;
+
+        for (const shopOrder of order.shopOrders) {
+            if(shopOrder.status === "delivered") {
+                const foundItem = shopOrder.shopOrderItems.find(i => i.item.toString() === itemId);
+                if(foundItem) {
+                    orderItem = foundItem;
+                    isDelivered = true;
+                    break;
+                }
+            }
+        }
+
+        if(!orderItem) {
+             return res.status(400).json({message:"item not found in delivered orders"})
+        }
+
+        if(orderItem.isRated) {
+             return res.status(400).json({message:"item is already rated for this order"})
         }
 
         const item=await Item.findById(itemId)
@@ -180,6 +209,10 @@ export const rating=async (req,res) => {
         item.rating.count=newCount
         item.rating.average=newAverage
         await item.save()
+
+        orderItem.isRated = true;
+        await order.save();
+
 return res.status(200).json({rating:item.rating})
 
     } catch (error) {

@@ -10,6 +10,10 @@ import userRouter from "./routes/user.routes.js"
 import itemRouter from "./routes/item.routes.js"
 import shopRouter from "./routes/shop.routes.js"
 import orderRouter from "./routes/order.routes.js"
+import tableRouter from "./routes/table.routes.js"
+import tableBookingRouter from "./routes/tableBooking.routes.js"
+import hallRouter from "./routes/hall.routes.js"
+import hallBookingRouter from "./routes/hallBooking.routes.js"
 import http from "http"
 import { Server } from "socket.io"
 import { socketHandler } from "./socket.js"
@@ -41,6 +45,10 @@ app.use("/api/user",userRouter)
 app.use("/api/shop",shopRouter)
 app.use("/api/item",itemRouter)
 app.use("/api/order",orderRouter)
+app.use("/api/table",tableRouter)
+app.use("/api/table-booking",tableBookingRouter)
+app.use("/api/hall", hallRouter)
+app.use("/api/hall-booking", hallBookingRouter)
 
 socketHandler(io)
 server.listen(port,()=>{

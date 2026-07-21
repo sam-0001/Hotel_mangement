@@ -1,17 +1,30 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { serverUrl } from '../App'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { FaStore } from "react-icons/fa6";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaUtensils } from "react-icons/fa";
 import FoodCard from '../components/FoodCard';
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaCalendarAlt } from "react-icons/fa";
+import TableBookingModal from '../components/TableBookingModal';
 function Shop() {
     const {shopId}=useParams()
     const [items,setItems]=useState([])
     const [shop,setShop]=useState([])
+    const [showBookingModal, setShowBookingModal] = useState(false)
     const navigate=useNavigate()
+    const [searchParams] = useSearchParams()
+    
+    useEffect(() => {
+        const tableId = searchParams.get('table');
+        if (tableId) {
+            localStorage.setItem('dineInTable', JSON.stringify({ shopId, tableId }));
+        } else {
+            localStorage.removeItem('dineInTable');
+        }
+    }, [searchParams, shopId]);
+
     const handleShop=async () => {
         try {
            const result=await axios.get(`${serverUrl}/api/item/get-by-shop/${shopId}`,{withCredentials:true}) 
@@ -40,9 +53,14 @@ handleShop()
           <FaLocationDot size={22} color='red'/>
              <p className='text-lg font-medium text-gray-200 mt-[10px]'>{shop.address}</p>
              </div>
+              <button onClick={() => setShowBookingModal(true)} className='mt-6 flex items-center gap-2 bg-[#ff4d2d] hover:bg-[#e64323] text-white px-6 py-3 rounded-full font-bold shadow-lg transition transform hover:scale-105'>
+                  <FaCalendarAlt /> Book a Table
+              </button>
           </div>
        
         </div>}
+        
+        {showBookingModal && <TableBookingModal shopId={shopId} onClose={() => setShowBookingModal(false)} />}
 
 <div className='max-w-7xl mx-auto px-6 py-10'>
 <h2 className='flex items-center justify-center gap-3 text-3xl font-bold mb-10 text-gray-800'><FaUtensils color='red'/> Our Menu</h2>

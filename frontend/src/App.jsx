@@ -18,9 +18,17 @@ import CheckOut from './pages/CheckOut'
 import OrderPlaced from './pages/OrderPlaced'
 import MyOrders from './pages/MyOrders'
 import useGetMyOrders from './hooks/useGetMyOrders'
+import useGetMyBookings from './hooks/useGetMyBookings'
 import useUpdateLocation from './hooks/useUpdateLocation'
 import TrackOrderPage from './pages/TrackOrderPage'
 import Shop from './pages/Shop'
+import DineInRestaurants from './pages/DineInRestaurants'
+import Halls from './pages/Halls'
+import OwnerTableManagement from './pages/OwnerTableManagement'
+import OwnerTableBookings from './pages/OwnerTableBookings'
+import ShopHalls from './pages/ShopHalls'
+import OwnerHallManagement from './pages/OwnerHallManagement'
+import OwnerHallBookings from './pages/OwnerHallBookings'
 import { useEffect } from 'react'
 import { io } from 'socket.io-client'
 import { setSocket } from './redux/userSlice'
@@ -36,6 +44,7 @@ useUpdateLocation()
   useGetShopByCity()
   useGetItemsByCity()
   useGetMyOrders()
+  useGetMyBookings()
 
   useEffect(()=>{
 const socketInstance=io(serverUrl,{withCredentials:true})
@@ -52,7 +61,9 @@ return ()=>{
 
   return (
    <Routes>
-    <Route path='/signup' element={!userData?<SignUp/>:<Navigate to={"/"}/>}/>
+    <Route path='/signup' element={!userData?<SignUp role="user"/>:<Navigate to={"/"}/>}/>
+    <Route path='/owner' element={!userData?<SignUp role="owner"/>:<Navigate to={"/"}/>}/>
+    <Route path='/rider' element={!userData?<SignUp role="deliveryBoy"/>:<Navigate to={"/"}/>}/>
     <Route path='/signin' element={!userData?<SignIn/>:<Navigate to={"/"}/>}/>
       <Route path='/forgot-password' element={!userData?<ForgotPassword/>:<Navigate to={"/"}/>}/>
       <Route path='/' element={userData?<Home/>:<Navigate to={"/signin"}/>}/>
@@ -65,6 +76,13 @@ return ()=>{
 <Route path='/my-orders' element={userData?<MyOrders/>:<Navigate to={"/signin"}/>}/>
 <Route path='/track-order/:orderId' element={userData?<TrackOrderPage/>:<Navigate to={"/signin"}/>}/>
 <Route path='/shop/:shopId' element={userData?<Shop/>:<Navigate to={"/signin"}/>}/>
+<Route path='/dine-in' element={userData?<DineInRestaurants/>:<Navigate to={"/signin"}/>}/>
+<Route path='/halls' element={userData?<Halls/>:<Navigate to={"/signin"}/>}/>
+<Route path='/shop-halls/:shopId' element={userData?<ShopHalls/>:<Navigate to={"/signin"}/>}/>
+<Route path='/owner/tables' element={userData?.role==='owner'?<OwnerTableManagement/>:<Navigate to={"/"}/>}/>
+<Route path='/owner/table-bookings' element={userData?.role==='owner'?<OwnerTableBookings/>:<Navigate to={"/"}/>}/>
+<Route path='/owner/halls' element={userData?.role==='owner'?<OwnerHallManagement/>:<Navigate to={"/"}/>}/>
+<Route path='/owner/hall-bookings' element={userData?.role==='owner'?<OwnerHallBookings/>:<Navigate to={"/"}/>}/>
    </Routes>
   )
 }

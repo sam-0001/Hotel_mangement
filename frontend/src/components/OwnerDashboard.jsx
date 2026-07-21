@@ -1,7 +1,7 @@
 import React from 'react'
 import Nav from './NaV.JSX'
 import { useSelector } from 'react-redux'
-import { FaUtensils } from "react-icons/fa";
+import { FaUtensils, FaChair, FaCalendarAlt, FaBuilding, FaClipboardList } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { FaPen } from "react-icons/fa";
 import OwnerItemCard from './ownerItemCard';
@@ -43,6 +43,21 @@ function OwnerDashboard() {
               <p className='text-gray-500 '>{myShopData.city},{myShopData.state}</p>
               <p className='text-gray-500 mb-4'>{myShopData.address}</p>
             </div>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 w-full max-w-3xl">
+            <button onClick={() => navigate('/owner/tables')} className='flex-1 min-w-[200px] flex items-center justify-center gap-2 bg-white text-gray-800 border-2 border-[#ff4d2d] px-4 py-3 rounded-xl font-bold shadow-sm hover:bg-orange-50 transition'>
+              <FaChair className="text-[#ff4d2d]" /> Manage Tables
+            </button>
+            <button onClick={() => navigate('/owner/table-bookings')} className='flex-1 min-w-[200px] flex items-center justify-center gap-2 bg-white text-gray-800 border-2 border-[#ff4d2d] px-4 py-3 rounded-xl font-bold shadow-sm hover:bg-orange-50 transition'>
+              <FaCalendarAlt className="text-[#ff4d2d]" /> Table Bookings
+            </button>
+            <button onClick={() => navigate('/owner/halls')} className='flex-1 min-w-[200px] flex items-center justify-center gap-2 bg-white text-gray-800 border-2 border-[#ff4d2d] px-4 py-3 rounded-xl font-bold shadow-sm hover:bg-orange-50 transition'>
+              <FaBuilding className="text-[#ff4d2d]" /> Manage Halls
+            </button>
+            <button onClick={() => navigate('/owner/hall-bookings')} className='flex-1 min-w-[200px] flex items-center justify-center gap-2 bg-white text-gray-800 border-2 border-[#ff4d2d] px-4 py-3 rounded-xl font-bold shadow-sm hover:bg-orange-50 transition'>
+              <FaClipboardList className="text-[#ff4d2d]" /> Hall Bookings
+            </button>
           </div>
 
           {myShopData.items.length==0 && 

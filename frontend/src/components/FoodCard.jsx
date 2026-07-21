@@ -8,19 +8,22 @@ import { FaPlus } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../redux/userSlice';
+import axios from 'axios';
+import { serverUrl } from '../App';
 
 function FoodCard({data}) {
 const [quantity,setQuantity]=useState(0)
 const dispatch=useDispatch()
 const {cartItems}=useSelector(state=>state.user)
+
     const renderStars=(rating)=>{   //r=3
         const stars=[];
         for (let i = 1; i <= 5; i++) {
            stars.push(
             (i<=rating)?(
-                <FaStar className='text-yellow-500 text-lg'/>
+                <FaStar key={i} className='text-yellow-500 text-lg ' />
             ):(
-                <FaRegStar className='text-yellow-500 text-lg'/>
+                <FaRegStar key={i} className='text-yellow-500 text-lg ' />
             )
            )
             
@@ -54,8 +57,8 @@ const newQty=quantity-1
 
 <div className='flex items-center gap-1 mt-1'>
 {renderStars(data.rating?.average || 0)}
-<span className='text-xs text-gray-500'>
-    {data.rating?.count || 0}
+<span className='text-xs text-gray-500 ml-1'>
+    {(data.rating?.average || 0).toFixed(1)} / 5 ({data.rating?.count || 0} reviews)
 </span>
 </div>
       </div>
