@@ -46,11 +46,8 @@ export const getShopByCity=async (req,res) => {
     try {
         const {city}=req.params
 
-        let query = {};
-        if (city && city !== "null" && city !== "undefined" && city !== "All") {
-            const firstWord = city.split(" ")[0];
-            query.city = {$regex:new RegExp(firstWord, "i")};
-        }
+        // Single restaurant app: Ignore city filter entirely and return all shops
+        const query = {};
 
         const shops=await Shop.find(query).populate('items')
         if(!shops){
