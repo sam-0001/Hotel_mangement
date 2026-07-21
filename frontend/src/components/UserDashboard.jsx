@@ -131,7 +131,11 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
        </h1>
 
 <div className='w-full h-auto flex flex-wrap gap-[20px] justify-center'>
-{updatedItemsList?.map((item,index)=>(
+{!itemsInMyCity ? (
+  <div className="flex w-full justify-center py-10">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ff4d2d]"></div>
+  </div>
+) : updatedItemsList?.map((item,index)=>(
   <FoodCard key={index} data={item}/>
 ))}
 </div>

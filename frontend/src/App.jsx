@@ -33,9 +33,11 @@ import { useEffect } from 'react'
 import { io } from 'socket.io-client'
 import { setSocket } from './redux/userSlice'
 
+import { ClipLoader } from 'react-spinners'
+
 export const serverUrl="https://hotel-mangement-tewc.onrender.com"
 function App() {
-    const {userData}=useSelector(state=>state.user)
+    const {userData, isAuthChecking}=useSelector(state=>state.user)
     const dispatch=useDispatch()
   useGetCurrentUser()
 useUpdateLocation()
@@ -58,6 +60,14 @@ return ()=>{
   socketInstance.disconnect()
 }
   },[userData?._id])
+
+  if (isAuthChecking) {
+      return (
+          <div className="flex h-screen items-center justify-center bg-[#fff9f6]">
+              <ClipLoader color="#ff4d2d" size={50} />
+          </div>
+      )
+  }
 
   return (
    <Routes>
