@@ -76,19 +76,19 @@ return ()=>{
     <Route path='/rider' element={!userData?<SignUp role="deliveryBoy"/>:<Navigate to={"/"}/>}/>
     <Route path='/signin' element={!userData?<SignIn/>:<Navigate to={"/"}/>}/>
       <Route path='/forgot-password' element={!userData?<ForgotPassword/>:<Navigate to={"/"}/>}/>
-      <Route path='/' element={userData?<Home/>:<Navigate to={"/signin"}/>}/>
+      <Route path='/' element={<Home/>}/>
 <Route path='/create-edit-shop' element={userData?<CreateEditShop/>:<Navigate to={"/signin"}/>}/>
 <Route path='/add-item' element={userData?<AddItem/>:<Navigate to={"/signin"}/>}/>
 <Route path='/edit-item/:itemId' element={userData?<EditItem/>:<Navigate to={"/signin"}/>}/>
-<Route path='/cart' element={userData?<CartPage/>:<Navigate to={"/signin"}/>}/>
+<Route path='/cart' element={<CartPage/>}/>
 <Route path='/checkout' element={userData?<CheckOut/>:<Navigate to={"/signin"}/>}/>
 <Route path='/order-placed' element={userData?<OrderPlaced/>:<Navigate to={"/signin"}/>}/>
 <Route path='/my-orders' element={userData?<MyOrders/>:<Navigate to={"/signin"}/>}/>
 <Route path='/track-order/:orderId' element={userData?<TrackOrderPage/>:<Navigate to={"/signin"}/>}/>
-<Route path='/shop/:shopId' element={userData?<Shop/>:<Navigate to={"/signin"}/>}/>
-<Route path='/dine-in' element={userData?<DineInRestaurants/>:<Navigate to={"/signin"}/>}/>
-<Route path='/halls' element={userData?<Halls/>:<Navigate to={"/signin"}/>}/>
-<Route path='/shop-halls/:shopId' element={userData?<ShopHalls/>:<Navigate to={"/signin"}/>}/>
+<Route path='/shop/:shopId' element={<Shop/>}/>
+<Route path='/dine-in' element={<DineInRestaurants/>}/>
+<Route path='/halls' element={<Halls/>}/>
+<Route path='/shop-halls/:shopId' element={<ShopHalls/>}/>
 <Route path='/owner/tables' element={userData?.role==='owner'?<OwnerTableManagement/>:<Navigate to={"/"}/>}/>
 <Route path='/owner/table-bookings' element={userData?.role==='owner'?<OwnerTableBookings/>:<Navigate to={"/"}/>}/>
 <Route path='/owner/halls' element={userData?.role==='owner'?<OwnerHallManagement/>:<Navigate to={"/"}/>}/>

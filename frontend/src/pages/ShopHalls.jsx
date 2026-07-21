@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { serverUrl } from '../App';
@@ -8,6 +9,7 @@ import HallBookingModal from '../components/HallBookingModal';
 function ShopHalls() {
     const { shopId } = useParams();
     const navigate = useNavigate();
+    const { userData } = useSelector(state => state.user);
     const [shop, setShop] = useState(null);
     const [halls, setHalls] = useState([]);
     const [selectedHall, setSelectedHall] = useState(null);
@@ -46,12 +48,14 @@ function ShopHalls() {
                             <button className='flex items-center gap-2 bg-black/40 hover:bg-black/60 text-white px-4 py-2 rounded-full backdrop-blur-sm transition' onClick={() => navigate("/halls")}>
                                 <FaArrowLeft /> Back
                             </button>
-                            <button 
-                                onClick={() => navigate('/my-orders', { state: { tab: 'hall_bookings' } })}
-                                className='bg-white/90 hover:bg-white text-blue-600 px-4 py-2 rounded-full font-bold shadow-sm transition backdrop-blur-sm'
-                            >
-                                My Bookings
-                            </button>
+                            {userData && (
+                                <button 
+                                    onClick={() => navigate('/my-orders', { state: { tab: 'hall_bookings' } })}
+                                    className='bg-white/90 hover:bg-white text-blue-600 px-4 py-2 rounded-full font-bold shadow-sm transition backdrop-blur-sm'
+                                >
+                                    My Bookings
+                                </button>
+                            )}
                         </div>
                         <h1 className='text-3xl md:text-5xl font-extrabold text-white mb-2 drop-shadow-md'>{shop.name} Halls</h1>
                         <div className='flex items-center gap-2 text-gray-200'>
@@ -96,7 +100,13 @@ function ShopHalls() {
                                             <p className='text-2xl font-black text-gray-900'>₹{hall.pricePerHour}<span className='text-base font-normal text-gray-500'>/hr</span></p>
                                         </div>
                                         <button 
-                                            onClick={() => setSelectedHall(hall)}
+                                            onClick={() => {
+                                                if (!userData) {
+                                                    navigate('/signin');
+                                                } else {
+                                                    setSelectedHall(hall);
+                                                }
+                                            }}
                                             className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-md transition transform hover:-translate-y-0.5'
                                         >
                                             Book Now

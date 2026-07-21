@@ -6,7 +6,7 @@ import { FaLocationDot, FaStore } from "react-icons/fa6";
 import { FaBuilding } from "react-icons/fa";
 
 function Halls() {
-    const { shopInMyCity } = useSelector(state => state.user);
+    const { shopInMyCity, userData } = useSelector(state => state.user);
     const navigate = useNavigate();
 
     return (
@@ -18,12 +18,14 @@ function Halls() {
                         <h1 className='text-3xl md:text-4xl font-extrabold text-gray-800 mb-2'>Event Halls</h1>
                         <p className='text-gray-600 text-lg'>Discover and book the best banquet halls and event spaces in your city.</p>
                     </div>
-                    <button 
-                        onClick={() => navigate('/my-orders', { state: { tab: 'hall_bookings' } })}
-                        className='bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 font-bold py-2 px-6 rounded-xl transition shadow-sm'
-                    >
-                        My Bookings
-                    </button>
+                    {userData && (
+                        <button 
+                            onClick={() => navigate('/my-orders', { state: { tab: 'hall_bookings' } })}
+                            className='bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 font-bold py-2 px-6 rounded-xl transition shadow-sm'
+                        >
+                            My Bookings
+                        </button>
+                    )}
                 </div>
 
                 {shopInMyCity && shopInMyCity.length > 0 ? (

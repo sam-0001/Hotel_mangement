@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import CartItemCard from '../components/CartItemCard';
 function CartPage() {
     const navigate = useNavigate()
-    const { cartItems, totalAmount } = useSelector(state => state.user)
+    const { cartItems, totalAmount, userData } = useSelector(state => state.user)
     return (
         <div className='min-h-screen bg-[#fff9f6] flex justify-center p-6'>
             <div className='w-full max-w-[800px]'>
@@ -29,7 +29,13 @@ function CartPage() {
                         <span className='text-xl font-bold text-[#ff4d2d]'>₹{totalAmount}</span>
                     </div>
                     <div className='mt-4 flex justify-end' > 
-                        <button className='bg-[#ff4d2d] text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-[#e64526] transition cursor-pointer' onClick={()=>navigate("/checkout")}>Proceed to CheckOut</button>
+                        <button className='bg-[#ff4d2d] text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-[#e64526] transition cursor-pointer' onClick={()=>{
+                            if (!userData) {
+                                navigate("/signin");
+                            } else {
+                                navigate("/checkout");
+                            }
+                        }}>Proceed to CheckOut</button>
                     </div>
                 </>
                 )}

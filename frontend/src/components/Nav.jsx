@@ -50,7 +50,7 @@ handleSearchItems()
             <div className='w-full max-w-6xl h-full flex items-center justify-between gap-[10px] md:gap-[30px] px-[10px]'>
 
 
-            {showSearch && userData.role == "user" && <div className='w-[90%] h-[70px]  bg-white shadow-xl rounded-lg items-center gap-[20px] flex fixed top-[80px] left-[5%] md:hidden'>
+            {showSearch && (!userData || userData.role == "user") && <div className='w-[90%] h-[70px]  bg-white shadow-xl rounded-lg items-center gap-[20px] flex fixed top-[80px] left-[5%] md:hidden'>
                 <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-400'>
                     <FaLocationDot size={25} className=" text-[#ff4d2d]" />
                     <div className='w-[80%] truncate text-gray-600'>{currentCity}</div>
@@ -66,7 +66,7 @@ handleSearchItems()
             <div className="flex items-center justify-center shrink-0">
                 <img src={logo} alt="The Hometown Kitchen n cafe Restaurant" className="h-[70px] md:h-[80px] w-auto cursor-pointer object-contain scale-[1.5] origin-left" onClick={() => navigate("/")} />
             </div>
-            {userData.role == "user" && <div className='md:w-[60%] lg:w-[40%] h-[70px] bg-white shadow-xl rounded-lg items-center gap-[20px] hidden md:flex'>
+            {(!userData || userData.role == "user") && <div className='md:w-[60%] lg:w-[40%] h-[70px] bg-white shadow-xl rounded-lg items-center gap-[20px] hidden md:flex'>
                 <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-400'>
                     <FaLocationDot size={25} className=" text-[#ff4d2d]" />
                     <div className='w-[80%] truncate text-gray-600'>{currentCity}</div>
@@ -78,9 +78,9 @@ handleSearchItems()
             </div>}
 
             <div className='flex items-center gap-4'>
-                {userData.role == "user" && (showSearch ? <RxCross2 size={25} className='text-[#ff4d2d] md:hidden' onClick={() => setShowSearch(false)} /> : <IoIosSearch size={25} className='text-[#ff4d2d] md:hidden' onClick={() => setShowSearch(true)} />)
+                {(!userData || userData.role == "user") && (showSearch ? <RxCross2 size={25} className='text-[#ff4d2d] md:hidden' onClick={() => setShowSearch(false)} /> : <IoIosSearch size={25} className='text-[#ff4d2d] md:hidden' onClick={() => setShowSearch(true)} />)
                 }
-                {userData.role == "owner"? <>
+                {userData?.role == "owner"? <>
                  {myShopData && <> <button className='hidden md:flex items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]' onClick={()=>navigate("/add-item")}>
                         <FaPlus size={20} />
                         <span>Add Food Item</span>
@@ -100,13 +100,13 @@ handleSearchItems()
                     </div>
                 </>: (
                     <>
-                 {userData.role=="user" &&    <div className='relative cursor-pointer' onClick={()=>navigate("/cart")}>
+                 {(!userData || userData.role=="user") &&    <div className='relative cursor-pointer' onClick={()=>navigate("/cart")}>
                     <FiShoppingCart size={25} className='text-[#ff4d2d]' />
                     <span className='absolute right-[-9px] top-[-12px] text-[#ff4d2d]'>{cartItems.length}</span>
                 </div>}   
            
 
-                {userData.role == "user" && (
+                {(!userData || userData.role == "user") && (
                     <div className='hidden lg:flex items-center gap-4'>
                         <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={()=>navigate("/dine-in")}>
                             Book Table
@@ -117,18 +117,25 @@ handleSearchItems()
                     </div>
                 )}
 
-                <button className='hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium' onClick={()=>navigate("/my-orders")}>
+                {userData && <button className='hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium' onClick={()=>navigate("/my-orders")}>
                     My Orders
-                </button>
+                </button>}
                     </>
                 )}
 
 
 
+                {userData ? (
                 <div className='w-[40px] h-[40px] rounded-full flex items-center justify-center bg-[#ff4d2d] text-white text-[18px] shadow-xl font-semibold cursor-pointer' onClick={() => setShowInfo(prev => !prev)}>
-                    {userData?.fullName.slice(0, 1)}
+                    {userData.fullName.slice(0, 1)}
                 </div>
-                {showInfo && <div className={`fixed top-[80px] right-[10px] 
+                ) : (
+                <button className='bg-[#ff4d2d] hover:bg-[#e64323] text-white px-5 py-2 rounded-full font-bold shadow-md transition' onClick={() => navigate("/signin")}>
+                    Login
+                </button>
+                )}
+                
+                {showInfo && userData && <div className={`fixed top-[80px] right-[10px] 
                     ${userData.role=="deliveryBoy"?"md:right-[20%] lg:right-[40%]":"md:right-[10%] lg:right-[25%]"} w-[180px] bg-white shadow-2xl rounded-xl p-[20px] flex flex-col gap-[10px] z-[9999]`}>
                     <div className='text-[17px] font-semibold'>{userData.fullName}</div>
                     {userData.role=="user" && <div className='md:hidden text-[#ff4d2d] font-semibold cursor-pointer' onClick={()=>navigate("/my-orders")}>My Orders</div>}
