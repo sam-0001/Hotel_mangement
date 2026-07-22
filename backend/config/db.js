@@ -1,18 +1,20 @@
 import mongoose from "mongoose"
 
-let cachedConnection = null;
+let cachedPromise = null;
 
 const connectDb = async () => {
-    if (cachedConnection) {
-        console.log("Using cached db connection");
-        return cachedConnection;
+    if (cachedPromise) {
+        return cachedPromise;
     }
+    
     try {
-        const conn = await mongoose.connect(process.env.MONGODB_URL);
-        cachedConnection = conn;
+        console.log("Initializing new db connection...");
+        cachedPromise = mongoose.connect(process.env.MONGODB_URL);
+        await cachedPromise;
         console.log("db connected");
-        return conn;
+        return cachedPromise;
     } catch (error) {
+        cachedPromise = null;
         console.log("db error", error);
     }
 }

@@ -25,6 +25,13 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(cookieParser())
+
+// Ensure DB is connected before handling any requests
+app.use(async (req, res, next) => {
+    await connectDb();
+    next();
+});
+
 app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)
 app.use("/api/shop",shopRouter)
@@ -37,12 +44,8 @@ app.use("/api/hall-booking", hallBookingRouter)
 
 if (process.env.NODE_ENV !== 'production') {
     app.listen(port, () => {
-        connectDb()
         console.log(`server started at ${port}`)
     })
-} else {
-    // For Vercel Serverless, we just connect to DB and export the app
-    connectDb()
 }
 
 export default app;
