@@ -65,7 +65,7 @@ const userSlice = createSlice({
       }
 
       state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
-      localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
+      localStorage.setItem("cartItems", JSON.stringify(current(state.cartItems)));
       localStorage.setItem("cartTotal", state.totalAmount);
     },
 
@@ -83,14 +83,14 @@ const userSlice = createSlice({
         item.quantity = quantity
       }
       state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
-      localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
+      localStorage.setItem("cartItems", JSON.stringify(current(state.cartItems)));
       localStorage.setItem("cartTotal", state.totalAmount);
     },
 
     removeCartItem: (state, action) => {
       state.cartItems = state.cartItems.filter(i => i.id !== action.payload)
       state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
-      localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
+      localStorage.setItem("cartItems", JSON.stringify(current(state.cartItems)));
       localStorage.setItem("cartTotal", state.totalAmount);
     },
 

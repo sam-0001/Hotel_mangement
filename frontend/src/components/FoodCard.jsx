@@ -7,7 +7,7 @@ import { FaMinus } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart } from '../redux/userSlice';
+import { addToCart, updateQuantity, removeCartItem } from '../redux/userSlice';
 import axios from 'axios';
 import { serverUrl } from '../App';
 
