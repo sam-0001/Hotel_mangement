@@ -28,6 +28,10 @@ function SignIn() {
                 email,password
             },{withCredentials:true})
            dispatch(setUserData(result.data))
+           if(result.data.token){
+               localStorage.setItem("token", result.data.token);
+               axios.defaults.headers.common['Authorization'] = `Bearer ${result.data.token}`;
+           }
             setErr("")
             setLoading(false)
         } catch (error) {

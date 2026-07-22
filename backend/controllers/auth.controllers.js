@@ -33,7 +33,7 @@ export const signUp=async (req,res) => {
             httpOnly:true
         })
   
-        return res.status(201).json(user)
+        return res.status(201).json({...user._doc, token})
 
     } catch (error) {
         return res.status(500).json(`sign up error ${error}`)
@@ -61,7 +61,7 @@ export const signIn=async (req,res) => {
             httpOnly:true
         })
   
-        return res.status(200).json(user)
+        return res.status(200).json({...user._doc, token})
 
     } catch (error) {
         return res.status(500).json(`sign In error ${error}`)

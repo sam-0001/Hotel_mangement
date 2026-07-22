@@ -33,8 +33,15 @@ import { useEffect } from 'react'
 
 import { ClipLoader } from 'react-spinners'
 import CartBottomBar from './components/CartBottomBar'
+import axios from 'axios';
 
 export const serverUrl = import.meta.env.VITE_SERVER_URL || "https://hotel-mangement-tewc.onrender.com"
+
+const savedToken = localStorage.getItem("token");
+if (savedToken) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+}
+
 function App() {
     const {userData, isAuthChecking}=useSelector(state=>state.user)
     const dispatch=useDispatch()

@@ -22,6 +22,8 @@ function Nav() {
     const handleLogOut = async () => {
         try {
             const result = await axios.get(`${serverUrl}/api/auth/signout`, { withCredentials: true })
+            localStorage.removeItem("token");
+            delete axios.defaults.headers.common['Authorization'];
             dispatch(setUserData(null))
         } catch (error) {
             console.log(error)
