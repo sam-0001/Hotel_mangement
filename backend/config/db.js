@@ -1,11 +1,19 @@
 import mongoose from "mongoose"
 
-const connectDb=async () => {
+let cachedConnection = null;
+
+const connectDb = async () => {
+    if (cachedConnection) {
+        console.log("Using cached db connection");
+        return cachedConnection;
+    }
     try {
-        await mongoose.connect(process.env.MONGODB_URL)
-        console.log("db connected")
+        const conn = await mongoose.connect(process.env.MONGODB_URL);
+        cachedConnection = conn;
+        console.log("db connected");
+        return conn;
     } catch (error) {
-        console.log("db error")
+        console.log("db error", error);
     }
 }
 
