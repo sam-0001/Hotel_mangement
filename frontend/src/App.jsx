@@ -33,7 +33,7 @@ import { useEffect } from 'react'
 
 import { ClipLoader } from 'react-spinners'
 
-export const serverUrl="https://hotel-mangement-tewc.onrender.com"
+export const serverUrl = import.meta.env.VITE_SERVER_URL || "https://hotel-mangement-tewc.onrender.com"
 function App() {
     const {userData, isAuthChecking}=useSelector(state=>state.user)
     const dispatch=useDispatch()
