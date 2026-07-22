@@ -12,33 +12,13 @@ import { useState } from 'react';
 
 
 function MyOrders() {
-  const { userData, myOrders,socket} = useSelector(state => state.user)
+  const { userData, myOrders} = useSelector(state => state.user)
   const { myBookings } = useSelector(state => state.table)
   const { myHallBookings } = useGetMyHallBookings()
   const location = useLocation()
   const [activeTab, setActiveTab] = useState(location.state?.tab || 'orders');
   const navigate = useNavigate()
-const dispatch=useDispatch()
-  useEffect(()=>{
-socket?.on('newOrder',(data)=>{
-if(data.shopOrders?.owner._id==userData._id){
-dispatch(setMyOrders([data,...myOrders]))
-}
-})
-
-socket?.on('update-status',({orderId,shopId,status,userId})=>{
-if(userId==userData._id){
-  dispatch(updateRealtimeOrderStatus({orderId,shopId,status}))
-}
-})
-
-return ()=>{
-  socket?.off('newOrder')
-  socket?.off('update-status')
-}
-  },[socket])
-
-
+  const dispatch = useDispatch()
 
   
   return (

@@ -11,7 +11,6 @@ function TrackOrderPage() {
     const { orderId } = useParams()
     const [currentOrder, setCurrentOrder] = useState() 
     const navigate = useNavigate()
-    const {socket}=useSelector(state=>state.user)
     const [liveLocations,setLiveLocations]=useState({})
     const handleGetOrder = async () => {
         try {
@@ -21,15 +20,6 @@ function TrackOrderPage() {
             console.log(error)
         }
     }
-
-    useEffect(()=>{
-socket.on('updateDeliveryLocation',({deliveryBoyId,latitude,longitude})=>{
-setLiveLocations(prev=>({
-  ...prev,
-  [deliveryBoyId]:{lat:latitude,lon:longitude}
-}))
-})
-    },[socket])
 
     useEffect(() => {
         handleGetOrder()

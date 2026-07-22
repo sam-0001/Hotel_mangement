@@ -14,26 +14,7 @@ import tableRouter from "./routes/table.routes.js"
 import tableBookingRouter from "./routes/tableBooking.routes.js"
 import hallRouter from "./routes/hall.routes.js"
 import hallBookingRouter from "./routes/hallBooking.routes.js"
-import http from "http"
-import { Server } from "socket.io"
-import { socketHandler } from "./socket.js"
-
 const app=express()
-const server=http.createServer(app)
-
-const io=new Server(server,{
-   cors:{
-    origin: function(origin, callback) {
-        return callback(null, true);
-    },
-    credentials:true,
-    methods:['POST','GET']
-}
-})
-
-app.set("io",io)
-
-
 
 const port=process.env.PORT || 5000
 app.use(cors({
@@ -54,9 +35,9 @@ app.use("/api/table-booking",tableBookingRouter)
 app.use("/api/hall", hallRouter)
 app.use("/api/hall-booking", hallBookingRouter)
 
-socketHandler(io)
-server.listen(port,()=>{
+app.listen(port,()=>{
     connectDb()
     console.log(`server started at ${port}`)
 })
 
+export default app;

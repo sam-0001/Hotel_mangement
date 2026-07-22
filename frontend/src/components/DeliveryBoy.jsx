@@ -10,7 +10,7 @@ import { ClipLoader } from 'react-spinners'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 function DeliveryBoy() {
-  const {userData,socket}=useSelector(state=>state.user)
+  const {userData}=useSelector(state=>state.user)
   const [currentOrder,setCurrentOrder]=useState()
   const [showOtpBox,setShowOtpBox]=useState(false)
   const [availableAssignments,setAvailableAssignments]=useState(null)
@@ -20,14 +20,12 @@ const [deliveryBoyLocation,setDeliveryBoyLocation]=useState(null)
 const [loading,setLoading]=useState(false)
 const [message,setMessage]=useState("")
   useEffect(()=>{
-if(!socket || userData.role!=="deliveryBoy") return
 let watchId
 if(navigator.geolocation){
 watchId=navigator.geolocation.watchPosition((position)=>{
     const latitude=position.coords.latitude
     const longitude=position.coords.longitude
     setDeliveryBoyLocation({lat:latitude,lon:longitude})
-    socket.emit('updateLocation',{
       latitude,
       longitude,
       userId:userData._id
@@ -45,7 +43,7 @@ return ()=>{
   if(watchId)navigator.geolocation.clearWatch(watchId)
 }
 
-  },[socket,userData])
+  },[userData])
 
 
 const ratePerDelivery=50
@@ -84,11 +82,7 @@ const totalEarning=todayDeliveries.reduce((sum,d)=>sum + d.count*ratePerDelivery
   }
 
   useEffect(()=>{
-    socket.on('newAssignment',(data)=>{
-      setAvailableAssignments(prev=>([...prev,data]))
-    })
     return ()=>{
-      socket.off('newAssignment')
     }
   },[socket])
   

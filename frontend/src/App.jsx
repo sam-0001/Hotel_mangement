@@ -30,8 +30,6 @@ import ShopHalls from './pages/ShopHalls'
 import OwnerHallManagement from './pages/OwnerHallManagement'
 import OwnerHallBookings from './pages/OwnerHallBookings'
 import { useEffect } from 'react'
-import { io } from 'socket.io-client'
-import { setSocket } from './redux/userSlice'
 
 import { ClipLoader } from 'react-spinners'
 
@@ -48,18 +46,7 @@ useUpdateLocation()
   useGetMyOrders()
   useGetMyBookings()
 
-  useEffect(()=>{
-const socketInstance=io(serverUrl,{withCredentials:true})
-dispatch(setSocket(socketInstance))
-socketInstance.on('connect',()=>{
-if(userData){
-  socketInstance.emit('identity',{userId:userData._id})
-}
-})
-return ()=>{
-  socketInstance.disconnect()
-}
-  },[userData?._id])
+
 
   if (isAuthChecking) {
       return (
