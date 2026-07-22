@@ -32,6 +32,7 @@ import OwnerHallBookings from './pages/OwnerHallBookings'
 import { useEffect } from 'react'
 
 import { ClipLoader } from 'react-spinners'
+import CartBottomBar from './components/CartBottomBar'
 
 export const serverUrl = import.meta.env.VITE_SERVER_URL || "https://hotel-mangement-tewc.onrender.com"
 function App() {
@@ -57,7 +58,9 @@ useUpdateLocation()
   }
 
   return (
-   <Routes>
+    <>
+      <CartBottomBar />
+      <Routes>
     <Route path='/signup' element={!userData?<SignUp role="user"/>:<Navigate to={"/"}/>}/>
     <Route path='/owner' element={!userData?<SignUp role="owner"/>:<Navigate to={"/"}/>}/>
     <Route path='/rider' element={!userData?<SignUp role="deliveryBoy"/>:<Navigate to={"/"}/>}/>
@@ -81,6 +84,7 @@ useUpdateLocation()
 <Route path='/owner/halls' element={userData?.role==='owner'?<OwnerHallManagement/>:<Navigate to={"/"}/>}/>
 <Route path='/owner/hall-bookings' element={userData?.role==='owner'?<OwnerHallBookings/>:<Navigate to={"/"}/>}/>
    </Routes>
+  </>
   )
 }
 
