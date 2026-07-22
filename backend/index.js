@@ -35,9 +35,14 @@ app.use("/api/table-booking",tableBookingRouter)
 app.use("/api/hall", hallRouter)
 app.use("/api/hall-booking", hallBookingRouter)
 
-app.listen(port,()=>{
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(port, () => {
+        connectDb()
+        console.log(`server started at ${port}`)
+    })
+} else {
+    // For Vercel Serverless, we just connect to DB and export the app
     connectDb()
-    console.log(`server started at ${port}`)
-})
+}
 
 export default app;
