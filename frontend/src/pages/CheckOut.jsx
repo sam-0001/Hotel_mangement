@@ -14,6 +14,7 @@ import { FaMobileScreenButton } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../App';
 import { addMyOrder, setTotalAmount } from '../redux/userSlice';
+import TableBookingModal from './TableBookingModal';
 function RecenterMap({ location }) {
   if (location.lat && location.lon) {
     const map = useMap()
@@ -32,15 +33,18 @@ function CheckOut() {
   const dispatch = useDispatch()
   const apiKey = import.meta.env.VITE_GEOAPIKEY
   const [dineInInfo, setDineInInfo] = useState(null)
+  const [orderType, setOrderType] = useState("delivery")
+  const [showBookingModal, setShowBookingModal] = useState(false)
   
   useEffect(() => {
     const info = localStorage.getItem('dineInTable');
     if (info) {
       setDineInInfo(JSON.parse(info));
+      setOrderType("dineIn");
     }
   }, []);
 
-  const deliveryFee= (totalAmount>500 || dineInInfo) ? 0 : 40
+  const deliveryFee= (orderType === "dineIn" || totalAmount>500) ? 0 : 40
   const AmountWithDeliveryFee=totalAmount+deliveryFee
 
 
@@ -88,12 +92,12 @@ function CheckOut() {
         paymentMethod,
         totalAmount:AmountWithDeliveryFee,
         cartItems,
-        orderType: dineInInfo ? "dineIn" : "delivery"
+        orderType: orderType
       };
 
-      if (dineInInfo) {
+      if (orderType === "dineIn" && dineInInfo) {
           payload.tableId = dineInInfo.tableId;
-      } else {
+      } else if (orderType === "delivery") {
           payload.deliveryAddress = {
             text:addressInput,
             latitude:location.lat,
@@ -159,7 +163,14 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
       <div className='w-full max-w-[900px] bg-white rounded-2xl shadow-xl p-6 space-y-6'>
         <h1 className='text-2xl font-bold text-gray-800'>Checkout</h1>
 
-        {!dineInInfo ? (
+        {!dineInInfo && (
+            <div className='flex items-center gap-4 border p-1 rounded-xl bg-gray-50'>
+                <button className={`flex-1 py-2 font-bold rounded-lg transition ${orderType === "delivery" ? "bg-[#ff4d2d] text-white shadow" : "text-gray-600 hover:bg-gray-200"}`} onClick={() => setOrderType("delivery")}>Delivery</button>
+                <button className={`flex-1 py-2 font-bold rounded-lg transition ${orderType === "dineIn" ? "bg-[#ff4d2d] text-white shadow" : "text-gray-600 hover:bg-gray-200"}`} onClick={() => setOrderType("dineIn")}>Dine-In</button>
+            </div>
+        )}
+
+        {orderType === "delivery" ? (
           <section>
             <h2 className='text-lg font-semibold mb-2 flex items-center gap-2 text-gray-800'><IoLocationSharp className='text-[#ff4d2d]' /> Delivery Location</h2>
             <div className='flex gap-2 mb-3'>
@@ -187,10 +198,19 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
             </div>
           </section>
         ) : (
-          <section className="bg-orange-50 border border-orange-200 p-6 rounded-xl text-center">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Dine-In Order</h2>
-            <p className="text-gray-600">Your food will be served directly to your table.</p>
+          <section className="bg-orange-50 border border-orange-200 p-6 rounded-xl text-center space-y-4">
+            <h2 className="text-xl font-bold text-gray-800">Dine-In Pre-Order</h2>
+            <p className="text-gray-600">Your food will be served directly to your table at the restaurant.</p>
+            {!dineInInfo && (
+                <button onClick={() => setShowBookingModal(true)} className='bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full transition shadow-md'>
+                    Book a Table
+                </button>
+            )}
           </section>
+        )}
+
+        {showBookingModal && (
+            <TableBookingModal shopId={cartItems[0]?.shop?._id || cartItems[0]?.shop} onClose={() => setShowBookingModal(false)} />
         )}
 
         <section>
