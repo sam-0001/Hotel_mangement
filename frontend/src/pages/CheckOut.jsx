@@ -14,7 +14,7 @@ import { FaMobileScreenButton } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../App';
 import { addMyOrder, setTotalAmount } from '../redux/userSlice';
-import TableBookingModal from './TableBookingModal';
+import TableBookingModal from '../components/TableBookingModal';
 function RecenterMap({ location }) {
   if (location.lat && location.lon) {
     const map = useMap()
