@@ -66,7 +66,6 @@ useUpdateLocation()
 
   return (
     <>
-      <CartBottomBar />
       <Routes>
     <Route path='/signup' element={!userData?<SignUp role="user"/>:<Navigate to={"/"}/>}/>
     <Route path='/owner' element={!userData?<SignUp role="owner"/>:<Navigate to={"/"}/>}/>
@@ -91,6 +90,7 @@ useUpdateLocation()
 <Route path='/owner/halls' element={userData?.role==='owner'?<OwnerHallManagement/>:<Navigate to={"/"}/>}/>
 <Route path='/owner/hall-bookings' element={userData?.role==='owner'?<OwnerHallBookings/>:<Navigate to={"/"}/>}/>
    </Routes>
+      <CartBottomBar />
   </>
   )
 }

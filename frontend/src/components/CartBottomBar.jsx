@@ -14,6 +14,8 @@ function CartBottomBar() {
     const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
+        <>
+        <div className="h-24 w-full"></div>
         <div className="fixed bottom-0 left-0 right-0 z-50 p-3 md:p-4 bg-transparent pointer-events-none">
             <div className="max-w-3xl mx-auto bg-green-600 rounded-xl shadow-2xl p-3 md:p-4 flex items-center justify-between text-white pointer-events-auto cursor-pointer hover:bg-green-700 transition" onClick={() => navigate('/cart')}>
                 <div className="flex items-center gap-4">
@@ -39,6 +41,7 @@ function CartBottomBar() {
                 </div>
             </div>
         </div>
+        </>
     );
 }
 
