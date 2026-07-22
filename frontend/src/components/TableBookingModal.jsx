@@ -3,7 +3,7 @@ import axios from 'axios';
 import { serverUrl } from '../App';
 import { RxCross2 } from "react-icons/rx";
 
-function TableBookingModal({ shopId, onClose }) {
+function TableBookingModal({ shopId, onClose, onSuccess }) {
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
     const [guests, setGuests] = useState(2);
@@ -22,12 +22,15 @@ function TableBookingModal({ shopId, onClose }) {
         setLoading(true);
         setErrorMessage("");
         try {
-            await axios.post(`${serverUrl}/api/table-booking/book`, {
+            const result = await axios.post(`${serverUrl}/api/table-booking/book`, {
                 shopId, date, time, guests, preference, smoking, specialOccasion, specialRequest, customerName, customerMobile
             }, { withCredentials: true });
             
             setSuccessMessage("Table booked successfully! You can view it in My Orders.");
             setTimeout(() => {
+                if (onSuccess) {
+                    onSuccess(result.data.booking || true);
+                }
                 onClose();
             }, 2000);
         } catch (error) {

@@ -35,12 +35,14 @@ function CheckOut() {
   const [dineInInfo, setDineInInfo] = useState(null)
   const [orderType, setOrderType] = useState("delivery")
   const [showBookingModal, setShowBookingModal] = useState(false)
+  const [isTableBooked, setIsTableBooked] = useState(false)
   
   useEffect(() => {
     const info = localStorage.getItem('dineInTable');
     if (info) {
       setDineInInfo(JSON.parse(info));
       setOrderType("dineIn");
+      setIsTableBooked(true);
     }
   }, []);
 
@@ -201,16 +203,24 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
           <section className="bg-orange-50 border border-orange-200 p-6 rounded-xl text-center space-y-4">
             <h2 className="text-xl font-bold text-gray-800">Dine-In Pre-Order</h2>
             <p className="text-gray-600">Your food will be served directly to your table at the restaurant.</p>
-            {!dineInInfo && (
+            {!isTableBooked ? (
                 <button onClick={() => setShowBookingModal(true)} className='bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full transition shadow-md'>
-                    Book a Table
+                    Book a Table First
                 </button>
+            ) : (
+                <div className='bg-green-100 text-green-700 font-bold py-2 px-6 rounded-full inline-block border border-green-300'>
+                    ✅ Table Booked! You can now place your order.
+                </div>
             )}
           </section>
         )}
 
         {showBookingModal && (
-            <TableBookingModal shopId={cartItems[0]?.shop?._id || cartItems[0]?.shop} onClose={() => setShowBookingModal(false)} />
+            <TableBookingModal 
+                shopId={cartItems[0]?.shop?._id || cartItems[0]?.shop} 
+                onClose={() => setShowBookingModal(false)} 
+                onSuccess={(bookingData) => setIsTableBooked(true)} 
+            />
         )}
 
         <section>
@@ -270,7 +280,13 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
 </div>
 </div>
         </section>
-        <button className='w-full bg-[#ff4d2d] hover:bg-[#e64526] text-white py-3 rounded-xl font-semibold' onClick={handlePlaceOrder}> {paymentMethod=="cod"?"Place Order":"Pay & Place Order"}</button>
+        <button 
+          className='w-full bg-[#ff4d2d] hover:bg-[#e64526] text-white py-3 rounded-xl font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition' 
+          onClick={handlePlaceOrder}
+          disabled={orderType === "dineIn" && !isTableBooked}
+        >
+          {paymentMethod === "cod" ? "Place Order" : "Pay & Place Order"}
+        </button>
 
       </div>
     </div>
