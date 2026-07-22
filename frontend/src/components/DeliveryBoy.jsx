@@ -26,17 +26,13 @@ watchId=navigator.geolocation.watchPosition((position)=>{
     const latitude=position.coords.latitude
     const longitude=position.coords.longitude
     setDeliveryBoyLocation({lat:latitude,lon:longitude})
-      latitude,
-      longitude,
-      userId:userData._id
-    })
-  }),
+  },
   (error)=>{
     console.log(error)
   },
   {
     enableHighAccuracy:true
-  }
+  })
 }
 
 return ()=>{
@@ -81,10 +77,7 @@ const totalEarning=todayDeliveries.reduce((sum,d)=>sum + d.count*ratePerDelivery
     }
   }
 
-  useEffect(()=>{
-    return ()=>{
-    }
-  },[socket])
+
   
   const sendOtp=async () => {
     setLoading(true)
