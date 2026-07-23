@@ -16,7 +16,7 @@ function OwnerTableBookings() {
 
     const [showWalkinModal, setShowWalkinModal] = useState(false);
     const [walkinData, setWalkinData] = useState({
-        customerName: "", customerMobile: "", guests: 2, preference: "Any", tableId: ""
+        customerName: "", customerMobile: "", guests: 2, preference: "Any", smoking: false
     });
 
     useEffect(() => {
@@ -68,12 +68,12 @@ function OwnerTableBookings() {
             }, { withCredentials: true });
             
             setShowWalkinModal(false);
-            setWalkinData({ customerName: "", customerMobile: "", guests: 2, preference: "Any", tableId: "" });
+            setWalkinData({ customerName: "", customerMobile: "", guests: 2, preference: "Any", smoking: false });
             fetchBookings();
             fetchTables();
         } catch (error) {
             console.log(error);
-            alert("Error creating walk-in");
+            alert(error.response?.data?.message || "Error creating walk-in");
         }
     };
 
@@ -183,13 +183,11 @@ function OwnerTableBookings() {
                                         <input type="number" required min="1" value={walkinData.guests} onChange={e=>setWalkinData({...walkinData, guests: e.target.value})} className='w-full border rounded-lg p-2.5 outline-none focus:border-[#ff4d2d]' />
                                     </div>
                                     <div className='flex-1'>
-                                        <label className='block text-sm font-medium text-gray-700 mb-1'>Assign Table</label>
-                                        <select value={walkinData.tableId} onChange={e=>setWalkinData({...walkinData, tableId: e.target.value})} className='w-full border rounded-lg p-2.5 outline-none focus:border-[#ff4d2d]'>
-                                            <option value="">None</option>
-                                            {shopTables.filter(t => t.status === "Available").map(t => (
-                                                <option key={t._id} value={t._id}>{t.tableNumber} {t.isSmokingZone ? '[Smoking]' : ''}</option>
-                                            ))}
-                                        </select>
+                                        <label className='block text-sm font-medium text-gray-700 mb-1'>Smoking Request</label>
+                                        <div className='flex items-center gap-2 mt-3'>
+                                            <input type="checkbox" id="walkinSmoking" checked={walkinData.smoking} onChange={e=>setWalkinData({...walkinData, smoking: e.target.checked})} className='w-4 h-4 text-[#ff4d2d] focus:ring-[#ff4d2d] border-gray-300 rounded' />
+                                            <label htmlFor="walkinSmoking" className='text-sm font-medium text-gray-700'>Requires Smoking Zone</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className='flex gap-3 mt-4'>

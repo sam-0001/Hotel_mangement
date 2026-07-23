@@ -8,22 +8,21 @@ export const createOnlineBooking = async (req, res) => {
         const { shopId, date, time, guests, preference, smoking, specialOccasion, specialRequest } = req.body;
         const userId = req.userId;
 
-        // Check if there are tables available for the requested time
-        const totalTables = await Table.countDocuments({ shop: shopId, status: { $ne: "Disabled" } });
+        const isSmokingRequest = smoking === true;
         
-        if (totalTables === 0) {
-            return res.status(400).json({ message: "This restaurant has no tables available for booking right now." });
-        }
-
-        const activeBookings = await TableBooking.countDocuments({
+        // Find a matching table that is available, fits the guests, and matches the smoking preference
+        // We sort by capacity ascending so we don't give a 10-seater to 2 guests if a 2-seater is available
+        const matchingTable = await Table.findOne({
             shop: shopId,
-            date: date,
-            time: time,
-            status: { $nin: ["Completed", "Cancelled", "No-Show"] }
-        });
+            status: "Available",
+            capacity: { $gte: guests },
+            isSmokingZone: isSmokingRequest
+        }).sort({ capacity: 1 });
 
-        if (activeBookings >= totalTables) {
-            return res.status(400).json({ message: "No tables available for this time. Please select another timing." });
+        if (!matchingTable) {
+            return res.status(400).json({ 
+                message: `No available ${isSmokingRequest ? 'smoking' : 'non-smoking'} tables found for ${guests} guests.` 
+            });
         }
 
         const newBooking = new TableBooking({
@@ -38,11 +37,18 @@ export const createOnlineBooking = async (req, res) => {
             smoking,
             specialOccasion,
             specialRequest,
-            bookingType: "Online"
+            bookingType: "Online",
+            table: matchingTable._id,
+            status: "Confirmed"
         });
 
         await newBooking.save();
-        res.status(201).json({ message: "Table booked successfully", booking: newBooking });
+
+        // Mark the assigned table as Reserved
+        matchingTable.status = "Reserved";
+        await matchingTable.save();
+
+        res.status(201).json({ message: "Table booked and automatically assigned successfully", booking: newBooking });
     } catch (error) {
         res.status(500).json({ message: `Error creating booking: ${error.message}` });
     }
@@ -51,11 +57,26 @@ export const createOnlineBooking = async (req, res) => {
 // Owner creates a walk-in or phone booking
 export const createWalkInBooking = async (req, res) => {
     try {
-        const { shopId, customerName, customerMobile, date, time, guests, preference, bookingType, tableId } = req.body;
+        const { shopId, customerName, customerMobile, date, time, guests, preference, bookingType, smoking } = req.body;
         const ownerId = req.userId;
 
         const shop = await Shop.findOne({ _id: shopId, owner: ownerId });
         if (!shop) return res.status(403).json({ message: "Unauthorized or shop not found" });
+
+        const isSmokingRequest = smoking === true;
+
+        const matchingTable = await Table.findOne({
+            shop: shopId,
+            status: "Available",
+            capacity: { $gte: guests },
+            isSmokingZone: isSmokingRequest
+        }).sort({ capacity: 1 });
+
+        if (!matchingTable) {
+            return res.status(400).json({ 
+                message: `No available ${isSmokingRequest ? 'smoking' : 'non-smoking'} tables found for ${guests} guests.` 
+            });
+        }
 
         const newBooking = new TableBooking({
             shop: shopId,
@@ -65,18 +86,18 @@ export const createWalkInBooking = async (req, res) => {
             time,
             guests,
             preference,
+            smoking: isSmokingRequest,
             bookingType: bookingType || "Walk-in",
-            table: tableId || null,
-            status: tableId ? "Arrived" : "Pending"
+            table: matchingTable._id,
+            status: "Arrived" // Walk-ins are typically arrived immediately
         });
 
         await newBooking.save();
 
-        if (tableId) {
-            await Table.findByIdAndUpdate(tableId, { status: "Occupied" });
-        }
+        matchingTable.status = "Occupied";
+        await matchingTable.save();
 
-        res.status(201).json({ message: "Booking created", booking: newBooking });
+        res.status(201).json({ message: "Walk-in created and table auto-assigned", booking: newBooking });
     } catch (error) {
         res.status(500).json({ message: `Error creating walk-in: ${error.message}` });
     }
