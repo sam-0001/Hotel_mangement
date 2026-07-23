@@ -153,21 +153,42 @@ export const getShopBookings = async (req, res) => {
             createdAt: { $gte: today }
         }).populate("shopOrders.shopOrderItems.item", "name").lean();
 
-        // Attach orders to bookings
+        // Initialize foodOrders array for all bookings
         for (let booking of bookings) {
             booking.foodOrders = [];
-            for (let order of activeOrders) {
-                // Match explicitly by tableBookingId or physical tableId
-                const matchesBookingId = order.tableBookingId && order.tableBookingId.toString() === booking._id.toString();
-                const matchesTableId = order.tableId && booking.table && order.tableId.toString() === booking.table._id.toString();
-                
-                if (matchesBookingId || matchesTableId) {
-                    
-                    const shopOrder = order.shopOrders.find(so => so.shop.toString() === shopId.toString());
-                    if (shopOrder && shopOrder.status !== "delivered") {
-                        booking.foodOrders.push(shopOrder);
-                    }
+        }
+
+        // Attach orders to the best matching booking
+        for (let order of activeOrders) {
+            const shopOrder = order.shopOrders.find(so => so.shop.toString() === shopId.toString());
+            if (!shopOrder || shopOrder.status === "delivered") continue;
+
+            let matchedBooking = null;
+
+            // 1. Try exact match by tableBookingId
+            if (order.tableBookingId) {
+                matchedBooking = bookings.find(b => b._id.toString() === order.tableBookingId.toString());
+            }
+
+            // 2. Try match by physical tableId
+            if (!matchedBooking && order.tableId) {
+                matchedBooking = bookings.find(b => b.table && b.table._id.toString() === order.tableId.toString() && (b.status === "Arrived" || b.status === "Confirmed"));
+                if (!matchedBooking) {
+                    matchedBooking = bookings.find(b => b.table && b.table._id.toString() === order.tableId.toString());
                 }
+            }
+
+            // 3. Try match by user account
+            if (!matchedBooking && order.user) {
+                matchedBooking = bookings.find(b => b.user && b.user.toString() === order.user.toString() && (b.status === "Arrived" || b.status === "Confirmed"));
+                if (!matchedBooking) {
+                    matchedBooking = bookings.find(b => b.user && b.user.toString() === order.user.toString());
+                }
+            }
+
+            // Attach to the single best matching booking
+            if (matchedBooking) {
+                matchedBooking.foodOrders.push(shopOrder);
             }
         }
 
