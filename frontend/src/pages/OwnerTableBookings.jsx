@@ -53,6 +53,7 @@ function OwnerTableBookings() {
             fetchTables();
         } catch (error) {
             console.log(error);
+            alert(error.response?.data?.message || "Error updating booking status");
         }
     };
 

@@ -9,19 +9,37 @@ export const createOnlineBooking = async (req, res) => {
         const userId = req.userId;
 
         const isSmokingRequest = smoking === true;
+        const reqTimeMins = parseInt(time.split(':')[0]) * 60 + parseInt(time.split(':')[1]);
         
-        // Find a matching table that is available, fits the guests, and matches the smoking preference
-        // We sort by capacity ascending so we don't give a 10-seater to 2 guests if a 2-seater is available
+        // Find all active bookings for this date to prevent double booking within a 2-hour window
+        const activeBookingsOnDate = await TableBooking.find({
+            shop: shopId,
+            date: date,
+            status: { $nin: ["Cancelled", "Completed", "No-Show"] }
+        });
+
+        const busyTableIds = activeBookingsOnDate.map(b => {
+            if (!b.table) return null;
+            const bTimeMins = parseInt(b.time.split(':')[0]) * 60 + parseInt(b.time.split(':')[1]);
+            // 120 minutes buffer
+            if (Math.abs(bTimeMins - reqTimeMins) < 120) {
+                return b.table.toString();
+            }
+            return null;
+        }).filter(id => id !== null);
+
+        // Find a matching table that is not busy at this time
         const matchingTable = await Table.findOne({
             shop: shopId,
-            status: "Available",
+            status: { $nin: ["Disabled", "Maintenance"] },
+            _id: { $nin: busyTableIds },
             capacity: { $gte: guests },
             isSmokingZone: isSmokingRequest
         }).sort({ capacity: 1 });
 
         if (!matchingTable) {
             return res.status(400).json({ 
-                message: `No available ${isSmokingRequest ? 'smoking' : 'non-smoking'} tables found for ${guests} guests.` 
+                message: `No available ${isSmokingRequest ? 'smoking' : 'non-smoking'} tables found for ${guests} guests at this time.` 
             });
         }
 
@@ -44,10 +62,6 @@ export const createOnlineBooking = async (req, res) => {
 
         await newBooking.save();
 
-        // Mark the assigned table as Reserved
-        matchingTable.status = "Reserved";
-        await matchingTable.save();
-
         res.status(201).json({ message: "Table booked and automatically assigned successfully", booking: newBooking });
     } catch (error) {
         res.status(500).json({ message: `Error creating booking: ${error.message}` });
@@ -65,6 +79,7 @@ export const createWalkInBooking = async (req, res) => {
 
         const isSmokingRequest = smoking === true;
 
+        // For Walk-in (right now), the table MUST be currently Available (nobody is sitting there)
         const matchingTable = await Table.findOne({
             shop: shopId,
             status: "Available",
@@ -138,17 +153,36 @@ export const updateBookingStatus = async (req, res) => {
         if (!shop) return res.status(403).json({ message: "Unauthorized" });
 
         if (status) {
-            booking.status = status;
+            // Handle automatic re-allocation if previous guest overstayed
             if (status === "Arrived" && booking.table) {
-                await Table.findByIdAndUpdate(booking.table, { status: "Occupied" });
+                const assignedTable = await Table.findById(booking.table);
+                if (assignedTable.status === "Occupied") {
+                    // Previous guest hasn't completed! Re-allocate to a new table
+                    const newTable = await Table.findOne({
+                        shop: booking.shop,
+                        status: "Available",
+                        capacity: { $gte: booking.guests },
+                        isSmokingZone: assignedTable.isSmokingZone
+                    }).sort({ capacity: 1 });
+
+                    if (newTable) {
+                        booking.table = newTable._id;
+                        await Table.findByIdAndUpdate(newTable._id, { status: "Occupied" });
+                    } else {
+                        return res.status(400).json({ message: `The pre-assigned table is still occupied by the previous guest, and no other suitable tables are available right now. Please ask the customer to wait.` });
+                    }
+                } else {
+                    await Table.findByIdAndUpdate(booking.table, { status: "Occupied" });
+                }
             } else if (status === "Completed" || status === "Cancelled" || status === "No-Show") {
                 if (booking.table) {
                     await Table.findByIdAndUpdate(booking.table, { status: "Cleaning" });
                 }
             }
+            booking.status = status;
         }
 
-        if (tableId) {
+        if (tableId && tableId !== booking.table?.toString()) {
             booking.table = tableId;
             if (status === "Arrived") {
                 await Table.findByIdAndUpdate(tableId, { status: "Occupied" });
