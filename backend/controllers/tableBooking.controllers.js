@@ -29,7 +29,7 @@ export const createOnlineBooking = async (req, res) => {
         }).filter(id => id !== null);
 
         // Find a matching table that is not busy at this time
-        const matchingTable = await Table.findOne({
+        let matchingTable = await Table.findOne({
             shop: shopId,
             status: { $nin: ["Disabled", "Maintenance"] },
             _id: { $nin: busyTableIds },
@@ -37,9 +37,19 @@ export const createOnlineBooking = async (req, res) => {
             isSmokingZone: isSmokingRequest
         }).sort({ capacity: 1 });
 
+        // Fallback: If no single table can fit all guests, assign the largest available table
+        if (!matchingTable) {
+            matchingTable = await Table.findOne({
+                shop: shopId,
+                status: { $nin: ["Disabled", "Maintenance"] },
+                _id: { $nin: busyTableIds },
+                isSmokingZone: isSmokingRequest
+            }).sort({ capacity: -1 }); // Sort by capacity descending to get the biggest table
+        }
+
         if (!matchingTable) {
             return res.status(400).json({ 
-                message: `No available ${isSmokingRequest ? 'smoking' : 'non-smoking'} tables found for ${guests} guests at this time.` 
+                message: `No available ${isSmokingRequest ? 'smoking' : 'non-smoking'} tables found at this time.` 
             });
         }
 
@@ -80,16 +90,25 @@ export const createWalkInBooking = async (req, res) => {
         const isSmokingRequest = smoking === true;
 
         // For Walk-in (right now), the table MUST be currently Available (nobody is sitting there)
-        const matchingTable = await Table.findOne({
+        let matchingTable = await Table.findOne({
             shop: shopId,
             status: "Available",
             capacity: { $gte: guests },
             isSmokingZone: isSmokingRequest
         }).sort({ capacity: 1 });
 
+        // Fallback: If no single table fits all guests, assign the largest available table
+        if (!matchingTable) {
+            matchingTable = await Table.findOne({
+                shop: shopId,
+                status: "Available",
+                isSmokingZone: isSmokingRequest
+            }).sort({ capacity: -1 });
+        }
+
         if (!matchingTable) {
             return res.status(400).json({ 
-                message: `No available ${isSmokingRequest ? 'smoking' : 'non-smoking'} tables found for ${guests} guests.` 
+                message: `No available ${isSmokingRequest ? 'smoking' : 'non-smoking'} tables found.` 
             });
         }
 
@@ -158,12 +177,21 @@ export const updateBookingStatus = async (req, res) => {
                 const assignedTable = await Table.findById(booking.table);
                 if (assignedTable.status === "Occupied") {
                     // Previous guest hasn't completed! Re-allocate to a new table
-                    const newTable = await Table.findOne({
+                    let newTable = await Table.findOne({
                         shop: booking.shop,
                         status: "Available",
                         capacity: { $gte: booking.guests },
                         isSmokingZone: assignedTable.isSmokingZone
                     }).sort({ capacity: 1 });
+
+                    // Fallback to the largest available table
+                    if (!newTable) {
+                        newTable = await Table.findOne({
+                            shop: booking.shop,
+                            status: "Available",
+                            isSmokingZone: assignedTable.isSmokingZone
+                        }).sort({ capacity: -1 });
+                    }
 
                     if (newTable) {
                         booking.table = newTable._id;
