@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IoIosArrowRoundBack } from "react-icons/io";
-import { FaCalendarAlt, FaClock, FaUsers, FaChair, FaPhone } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaUsers, FaChair, FaPhone, FaPlus } from "react-icons/fa";
 import axios from 'axios';
 import { serverUrl } from '../App';
 import { setShopBookings, setShopTables } from '../redux/tableSlice';
@@ -19,6 +19,13 @@ function OwnerTableBookings() {
     const [walkinData, setWalkinData] = useState({
         customerName: "", customerMobile: "", guests: 2, preference: "Any", smoking: false
     });
+    
+    // New States for Active Tables and Adding Items
+    const [activeTab, setActiveTab] = useState("all"); // "all" or "active"
+    const [showAddItemsModal, setShowAddItemsModal] = useState(false);
+    const [selectedBookingForItems, setSelectedBookingForItems] = useState(null);
+    const [orderItems, setOrderItems] = useState({}); // { itemId: quantity }
+    const [orderLoading, setOrderLoading] = useState(false);
 
     useEffect(() => {
         if (!myShopData) {
@@ -48,7 +55,6 @@ function OwnerTableBookings() {
     };
 
     const updateStatus = async (bookingId, status, tableId = null) => {
-        // Optimistic UI Update: Make it feel instant
         const previousBookings = [...shopBookings];
         const optimisticBookings = shopBookings.map(b => 
             b._id === bookingId ? { ...b, status: status } : b
@@ -57,12 +63,9 @@ function OwnerTableBookings() {
 
         try {
             await axios.patch(`${serverUrl}/api/table-booking/update/${bookingId}`, { status, tableId }, { withCredentials: true });
-            
-            // Silently fetch fresh data in background to ensure consistency
             fetchBookings();
             fetchTables();
         } catch (error) {
-            // Revert if API fails
             dispatch(setShopBookings(previousBookings));
             console.log(error);
             alert(error.response?.data?.message || "Error updating booking status");
@@ -90,10 +93,86 @@ function OwnerTableBookings() {
         }
     };
 
+    const getFilteredBookings = () => {
+        let filtered = [...shopBookings];
+        
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(b => b.customerName?.toLowerCase().includes(query) || b.customerMobile?.includes(query));
+        }
+
+        if (activeTab === "active") {
+            filtered = filtered.filter(b => (b.status === "Arrived" || (b.status === "Confirmed" && b.table)));
+            // Sort by tableNumber (assuming format like T1, T2)
+            filtered.sort((a, b) => {
+                const aNum = parseInt(a.table.tableNumber.replace(/\D/g, '')) || 0;
+                const bNum = parseInt(b.table.tableNumber.replace(/\D/g, '')) || 0;
+                return aNum - bNum;
+            });
+        }
+
+        return filtered;
+    };
+
+    const handleAddItemsClick = (booking) => {
+        setSelectedBookingForItems(booking);
+        setOrderItems({});
+        setShowAddItemsModal(true);
+    };
+
+    const handleItemQuantityChange = (itemId, delta) => {
+        setOrderItems(prev => {
+            const current = prev[itemId] || 0;
+            const next = current + delta;
+            if (next <= 0) {
+                const copy = {...prev};
+                delete copy[itemId];
+                return copy;
+            }
+            return { ...prev, [itemId]: next };
+        });
+    };
+
+    const handleSubmitOrder = async () => {
+        const cartItems = Object.keys(orderItems).map(itemId => {
+            const item = myShopData.items.find(i => i._id === itemId);
+            return {
+                _id: item._id,
+                name: item.name,
+                price: item.price,
+                quantity: orderItems[itemId]
+            };
+        });
+
+        if (cartItems.length === 0) return alert("Please select at least one item.");
+
+        const totalAmount = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+        
+        setOrderLoading(true);
+        try {
+            await axios.post(`${serverUrl}/api/order/owner-place-order`, {
+                shopId: myShopData._id,
+                tableId: selectedBookingForItems.table._id,
+                tableBookingId: selectedBookingForItems._id,
+                cartItems,
+                totalAmount
+            }, { withCredentials: true });
+            
+            setShowAddItemsModal(false);
+            setOrderItems({});
+            fetchBookings(); 
+        } catch (error) {
+            console.log(error);
+            alert(error.response?.data?.message || "Failed to add items to table");
+        } finally {
+            setOrderLoading(false);
+        }
+    };
+
     return (
         <div className='w-full min-h-screen bg-[#fff9f6] flex flex-col items-center px-4 py-8'>
             <div className='w-full max-w-5xl'>
-                <div className='flex flex-wrap items-center justify-between mb-8 gap-4'>
+                <div className='flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4'>
                     <div className='flex items-center gap-4'>
                         <div className='cursor-pointer bg-white p-2 rounded-full shadow hover:bg-gray-50' onClick={() => navigate("/")}>
                             <IoIosArrowRoundBack size={30} className='text-[#ff4d2d]' />
@@ -101,7 +180,7 @@ function OwnerTableBookings() {
                         <h1 className='text-3xl font-bold text-gray-800'>Reservations</h1>
                     </div>
                     
-                    <div className='flex items-center gap-4 flex-1 md:max-w-sm'>
+                    <div className='flex items-center gap-4 w-full md:w-auto flex-1 md:max-w-sm'>
                         <input 
                             type="text" 
                             placeholder="Search name or mobile..." 
@@ -111,19 +190,28 @@ function OwnerTableBookings() {
                         />
                     </div>
 
-                    <button onClick={() => setShowWalkinModal(true)} className='flex items-center gap-2 bg-[#ff4d2d] text-white px-5 py-2.5 rounded-lg font-bold shadow hover:bg-orange-600 transition whitespace-nowrap'>
+                    <button onClick={() => setShowWalkinModal(true)} className='flex items-center justify-center gap-2 bg-[#ff4d2d] text-white px-5 py-2.5 rounded-lg font-bold shadow hover:bg-orange-600 transition whitespace-nowrap w-full md:w-auto'>
                         Walk-in Guest
                     </button>
                 </div>
 
+                <div className='flex items-center gap-2 mb-6 bg-white p-1 rounded-xl shadow-sm border border-gray-100 w-fit mx-auto md:mx-0'>
+                    <button 
+                        onClick={() => setActiveTab("all")} 
+                        className={`px-6 py-2 rounded-lg font-bold transition ${activeTab === 'all' ? 'bg-[#ff4d2d] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                        All Bookings
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab("active")} 
+                        className={`px-6 py-2 rounded-lg font-bold transition ${activeTab === 'active' ? 'bg-[#ff4d2d] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                        Active Tables
+                    </button>
+                </div>
+
                 <div className='space-y-4'>
-                    {shopBookings
-                        .filter(booking => {
-                            if (!searchQuery) return true;
-                            const query = searchQuery.toLowerCase();
-                            return booking.customerName?.toLowerCase().includes(query) || booking.customerMobile?.includes(query);
-                        })
-                        .map((booking) => (
+                    {getFilteredBookings().map((booking) => (
                         <div key={booking._id} className='bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6'>
                             <div className='flex-1'>
                                 <div className='flex items-center gap-3 mb-2'>
@@ -172,8 +260,8 @@ function OwnerTableBookings() {
                             </div>
 
                             <div className='flex flex-col gap-3 min-w-[200px] w-full md:w-auto bg-gray-50 p-4 rounded-xl'>
-                                <div className='text-sm font-bold text-gray-700 mb-2'>
-                                    Table: <span className='text-[#ff4d2d]'>{booking.table ? booking.table.tableNumber : "None"}</span>
+                                <div className='text-sm font-bold text-gray-700 mb-2 flex justify-between items-center'>
+                                    <span>Table: <span className='text-[#ff4d2d] text-lg'>{booking.table ? booking.table.tableNumber : "None"}</span></span>
                                 </div>
                                 <div className='flex flex-col gap-2'>
                                     {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
@@ -182,7 +270,7 @@ function OwnerTableBookings() {
                                                 onClick={() => updateStatus(booking._id, 'Arrived')} 
                                                 className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded text-sm transition'
                                             >
-                                                Confirm
+                                                Confirm Arrival
                                             </button>
                                             <button 
                                                 onClick={() => updateStatus(booking._id, 'Cancelled')} 
@@ -193,12 +281,20 @@ function OwnerTableBookings() {
                                         </>
                                     )}
                                     {booking.status === 'Arrived' && (
-                                        <button 
-                                            onClick={() => updateStatus(booking._id, 'Completed')} 
-                                            className='bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-sm transition'
-                                        >
-                                            Completed
-                                        </button>
+                                        <>
+                                            <button 
+                                                onClick={() => handleAddItemsClick(booking)}
+                                                className='bg-[#ff4d2d] hover:bg-orange-600 text-white font-bold py-2 px-4 rounded text-sm transition flex items-center justify-center gap-2'
+                                            >
+                                                <FaPlus /> Add Food
+                                            </button>
+                                            <button 
+                                                onClick={() => updateStatus(booking._id, 'Completed')} 
+                                                className='bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-sm transition'
+                                            >
+                                                Completed
+                                            </button>
+                                        </>
                                     )}
                                     {(booking.status === 'Completed' || booking.status === 'Cancelled' || booking.status === 'No-Show') && (
                                         <div className={`text-center py-2 px-4 rounded font-bold text-sm ${booking.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -209,9 +305,11 @@ function OwnerTableBookings() {
                             </div>
                         </div>
                     ))}
-                    {shopBookings.length === 0 && (
+                    {getFilteredBookings().length === 0 && (
                         <div className='text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100'>
-                            <p className='text-gray-500 font-medium'>No reservations or walk-ins yet.</p>
+                            <p className='text-gray-500 font-medium'>
+                                {activeTab === "active" ? "No active tables currently." : "No reservations or walk-ins yet."}
+                            </p>
                         </div>
                     )}
                 </div>
@@ -246,6 +344,64 @@ function OwnerTableBookings() {
                                     <button type="submit" className='flex-1 bg-[#ff4d2d] text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition'>Save Walk-in</button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add Items Modal */}
+            {showAddItemsModal && selectedBookingForItems && (
+                <div className='fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4'>
+                    <div className='bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[80vh]'>
+                        <div className='p-6 border-b border-gray-100'>
+                            <h2 className='text-2xl font-bold text-gray-800'>Add Food to Table {selectedBookingForItems.table?.tableNumber}</h2>
+                            <p className='text-sm text-gray-500 mt-1'>For {selectedBookingForItems.customerName}</p>
+                        </div>
+                        
+                        <div className='p-6 overflow-y-auto flex-1 space-y-4 bg-gray-50'>
+                            {myShopData?.items?.length > 0 ? myShopData.items.map(item => {
+                                const quantity = orderItems[item._id] || 0;
+                                return (
+                                    <div key={item._id} className='flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-100'>
+                                        <div className='flex items-center gap-3'>
+                                            <img src={item.image} alt={item.name} className='w-12 h-12 rounded object-cover' />
+                                            <div>
+                                                <h4 className='font-bold text-gray-800'>{item.name}</h4>
+                                                <p className='text-[#ff4d2d] font-bold text-sm'>₹{item.price}</p>
+                                            </div>
+                                        </div>
+                                        <div className='flex items-center gap-3 bg-gray-100 rounded-full px-2 py-1'>
+                                            <button onClick={() => handleItemQuantityChange(item._id, -1)} className='w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-red-500 font-bold'>-</button>
+                                            <span className='w-4 text-center font-bold'>{quantity}</span>
+                                            <button onClick={() => handleItemQuantityChange(item._id, 1)} className='w-8 h-8 rounded-full bg-[#ff4d2d] text-white flex items-center justify-center font-bold'>+</button>
+                                        </div>
+                                    </div>
+                                )
+                            }) : (
+                                <p className='text-center text-gray-500 my-8'>No items in your menu.</p>
+                            )}
+                        </div>
+
+                        <div className='p-6 border-t border-gray-100 bg-white'>
+                            <div className='flex justify-between items-center mb-4 font-bold text-lg'>
+                                <span>Total:</span>
+                                <span className='text-[#ff4d2d]'>
+                                    ₹{Object.keys(orderItems).reduce((acc, itemId) => {
+                                        const item = myShopData.items.find(i => i._id === itemId);
+                                        return acc + (item.price * orderItems[itemId]);
+                                    }, 0)}
+                                </span>
+                            </div>
+                            <div className='flex gap-3'>
+                                <button onClick={() => setShowAddItemsModal(false)} className='flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-200 transition'>Cancel</button>
+                                <button 
+                                    onClick={handleSubmitOrder} 
+                                    disabled={orderLoading || Object.keys(orderItems).length === 0}
+                                    className='flex-1 bg-[#ff4d2d] text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition disabled:opacity-50'
+                                >
+                                    {orderLoading ? "Adding..." : "Add to Order"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

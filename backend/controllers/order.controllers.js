@@ -2,6 +2,7 @@ import DeliveryAssignment from "../models/deliveryAssignment.model.js"
 import Order from "../models/order.model.js"
 import Shop from "../models/shop.model.js"
 import User from "../models/user.model.js"
+import TableBooking from "../models/tableBooking.model.js"
 import { sendDeliveryOtpMail } from "../utils/mail.js"
 import RazorPay from "razorpay"
 import dotenv from "dotenv"
@@ -101,6 +102,45 @@ export const placeOrder = async (req, res) => {
     } catch (error) {
         console.error("placeOrder caught error:", error);
         return res.status(500).json({ message: `place order error ${error}` })
+    }
+}
+
+export const placeOrderAsOwner = async (req, res) => {
+    try {
+        const { shopId, tableId, tableBookingId, cartItems, totalAmount } = req.body;
+        const ownerId = req.userId;
+
+        const shop = await Shop.findById(shopId);
+        if (!shop || shop.owner.toString() !== ownerId.toString()) return res.status(403).json({ message: "Unauthorized" });
+
+        const tableBooking = await TableBooking.findById(tableBookingId);
+        const customerId = tableBooking?.user || null;
+
+        const shopOrders = [{
+            shop: shopId,
+            owner: ownerId,
+            subtotal: totalAmount,
+            shopOrderItems: cartItems.map(i => ({
+                item: i._id,
+                price: i.price,
+                quantity: i.quantity,
+                name: i.name
+            }))
+        }];
+
+        const newOrder = await Order.create({
+            user: customerId,
+            paymentMethod: 'cod',
+            orderType: "dineIn",
+            tableId,
+            totalAmount,
+            shopOrders,
+            payment: false
+        });
+
+        return res.status(201).json(newOrder);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 }
 
