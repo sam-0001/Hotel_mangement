@@ -176,7 +176,7 @@ export const updateBookingStatus = async (req, res) => {
                 }
             } else if (status === "Completed" || status === "Cancelled" || status === "No-Show") {
                 if (booking.table) {
-                    await Table.findByIdAndUpdate(booking.table, { status: "Cleaning" });
+                    await Table.findByIdAndUpdate(booking.table, { status: "Available" });
                 }
             }
             booking.status = status;

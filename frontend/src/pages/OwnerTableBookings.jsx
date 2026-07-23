@@ -125,37 +125,38 @@ function OwnerTableBookings() {
                             </div>
 
                             <div className='flex flex-col gap-3 min-w-[200px] w-full md:w-auto bg-gray-50 p-4 rounded-xl'>
-                                <div>
-                                    <label className='block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider'>Status</label>
-                                    <select 
-                                        value={booking.status} 
-                                        onChange={(e) => updateStatus(booking._id, e.target.value)}
-                                        className='w-full border rounded p-2 text-sm font-bold bg-white outline-none'
-                                    >
-                                        <option value="Pending">Pending</option>
-                                        <option value="Confirmed">Confirmed</option>
-                                        <option value="Arrived">Arrived (Eating)</option>
-                                        <option value="Completed">Completed</option>
-                                        <option value="Cancelled">Cancelled</option>
-                                        <option value="No-Show">No-Show</option>
-                                    </select>
+                                <div className='text-sm font-bold text-gray-700 mb-2'>
+                                    Table: <span className='text-[#ff4d2d]'>{booking.table ? booking.table.tableNumber : "None"}</span>
                                 </div>
-
-                                {(booking.status === "Confirmed" || booking.status === "Arrived") && (
-                                    <div>
-                                        <label className='block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider'>Assign Table</label>
-                                        <select 
-                                            value={booking.table?._id || ""} 
-                                            onChange={(e) => updateStatus(booking._id, booking.status, e.target.value)}
-                                            className='w-full border rounded p-2 text-sm font-bold bg-white outline-none'
-                                        >
-                                            <option value="">-- Assign Table --</option>
-                                            {shopTables.filter(t => t.status === "Available" || (booking.table && t._id === booking.table._id)).map(t => (
-                                                <option key={t._id} value={t._id}>{t.tableNumber} ({t.capacity} seats) {t.isSmokingZone ? '[Smoking]' : ''}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
+                                <div className='flex flex-col gap-2'>
+                                    {booking.status !== 'Completed' && booking.status !== 'Cancelled' && (
+                                        <>
+                                            <button 
+                                                onClick={() => updateStatus(booking._id, 'Arrived')} 
+                                                className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded text-sm transition'
+                                            >
+                                                Confirm
+                                            </button>
+                                            <button 
+                                                onClick={() => updateStatus(booking._id, 'Completed')} 
+                                                className='bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-sm transition'
+                                            >
+                                                Completed
+                                            </button>
+                                            <button 
+                                                onClick={() => updateStatus(booking._id, 'Cancelled')} 
+                                                className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded text-sm transition'
+                                            >
+                                                Cancelled
+                                            </button>
+                                        </>
+                                    )}
+                                    {(booking.status === 'Completed' || booking.status === 'Cancelled') && (
+                                        <div className={`text-center py-2 px-4 rounded font-bold text-sm ${booking.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                            {booking.status}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))}
