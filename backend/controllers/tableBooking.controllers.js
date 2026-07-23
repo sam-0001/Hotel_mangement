@@ -157,9 +157,11 @@ export const getShopBookings = async (req, res) => {
         for (let booking of bookings) {
             booking.foodOrders = [];
             for (let order of activeOrders) {
-                // Match by user ID or table ID
-                if ((booking.user && order.user && booking.user.toString() === order.user.toString()) || 
-                    (booking.table && order.tableId && booking.table._id.toString() === order.tableId.toString())) {
+                // Match explicitly by tableBookingId or physical tableId
+                const matchesBookingId = order.tableBookingId && order.tableBookingId.toString() === booking._id.toString();
+                const matchesTableId = order.tableId && booking.table && order.tableId.toString() === booking.table._id.toString();
+                
+                if (matchesBookingId || matchesTableId) {
                     
                     const shopOrder = order.shopOrders.find(so => so.shop.toString() === shopId.toString());
                     if (shopOrder && shopOrder.status !== "delivered") {

@@ -97,6 +97,13 @@ const userSlice = createSlice({
       localStorage.setItem("cartTotal", state.totalAmount);
     },
 
+    clearCart: (state) => {
+      state.cartItems = [];
+      state.totalAmount = 0;
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem("cartTotal");
+    },
+
     setMyOrders: (state, action) => {
       state.myOrders = action.payload
     },
@@ -132,5 +139,5 @@ const userSlice = createSlice({
   }
 })
 
-export const { setUserData, setIsAuthChecking, setCurrentAddress, setCurrentCity, setCurrentState, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrder, updateOrderStatus, setSearchItems, setTotalAmount,updateRealtimeOrderStatus} = userSlice.actions
+export const { setUserData, setIsAuthChecking, setCurrentAddress, setCurrentCity, setCurrentState, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem, clearCart, setMyOrders, addMyOrder, updateOrderStatus, setSearchItems, setTotalAmount,updateRealtimeOrderStatus} = userSlice.actions
 export default userSlice.reducer

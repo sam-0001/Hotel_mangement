@@ -17,7 +17,7 @@ let instance = new RazorPay({
 export const placeOrder = async (req, res) => {
     try {
         console.log("placeOrder called with body:", req.body);
-        const { cartItems, paymentMethod, deliveryAddress, totalAmount, orderType, tableId } = req.body
+        const { cartItems, paymentMethod, deliveryAddress, totalAmount, orderType, tableId, tableBookingId } = req.body
         if (!cartItems || cartItems.length == 0) {
             return res.status(400).json({ message: "cart is empty" })
         }
@@ -71,6 +71,7 @@ export const placeOrder = async (req, res) => {
                 deliveryAddress: orderType === "dineIn" ? undefined : deliveryAddress,
                 orderType,
                 tableId,
+                tableBookingId,
                 totalAmount,
                 shopOrders,
                 razorpayOrderId: razorOrder.id,
@@ -90,6 +91,7 @@ export const placeOrder = async (req, res) => {
             deliveryAddress: orderType === "dineIn" ? undefined : deliveryAddress,
             orderType,
             tableId,
+            tableBookingId,
             totalAmount,
             shopOrders
         })

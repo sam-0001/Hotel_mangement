@@ -75,6 +75,11 @@ const orderSchema = new mongoose.Schema({
         ref: "Table",
         default: null
     },
+    tableBookingId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "TableBooking",
+        default: null
+    },
     deliveryAddress: {
         text: String,
         latitude: Number,

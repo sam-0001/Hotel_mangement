@@ -13,7 +13,7 @@ import axios from 'axios';
 import { FaMobileScreenButton } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../App';
-import { addMyOrder, setTotalAmount } from '../redux/userSlice';
+import { addMyOrder, setTotalAmount, clearCart } from '../redux/userSlice';
 import TableBookingModal from '../components/TableBookingModal';
 function RecenterMap({ location }) {
   if (location.lat && location.lon) {
@@ -99,6 +99,7 @@ function CheckOut() {
 
       if (orderType === "dineIn" && dineInInfo) {
           payload.tableId = dineInInfo.tableId;
+          payload.tableBookingId = dineInInfo.bookingId;
       } else if (orderType === "delivery") {
           payload.deliveryAddress = {
             text:addressInput,
@@ -111,6 +112,7 @@ function CheckOut() {
 
       if(paymentMethod=="cod"){
       dispatch(addMyOrder(result.data))
+      dispatch(clearCart())
       navigate("/order-placed")
       }else{
         const orderId=result.data.orderId
@@ -140,6 +142,7 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
       orderId
     },{withCredentials:true})
         dispatch(addMyOrder(result.data))
+        dispatch(clearCart())
       navigate("/order-placed")
   } catch (error) {
     console.log(error)
@@ -219,7 +222,12 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
             <TableBookingModal 
                 shopId={cartItems[0]?.shop?._id || cartItems[0]?.shop} 
                 onClose={() => setShowBookingModal(false)} 
-                onSuccess={(bookingData) => setIsTableBooked(true)} 
+                onSuccess={(booking) => {
+                    setIsTableBooked(true);
+                    const info = { shopId: booking.shop, bookingId: booking._id };
+                    localStorage.setItem('dineInTable', JSON.stringify(info));
+                    setDineInInfo(info);
+                }} 
             />
         )}
 
