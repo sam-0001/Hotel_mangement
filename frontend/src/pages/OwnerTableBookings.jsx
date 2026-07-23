@@ -146,9 +146,27 @@ function OwnerTableBookings() {
                                     <span className='flex items-center gap-1.5'><FaChair className="text-[#ff4d2d]" /> {booking.preference}</span>
                                 </div>
                                 {(booking.specialOccasion || booking.specialRequest) && (
-                                    <div className='mt-3 bg-orange-50 p-3 rounded-lg text-sm text-orange-800'>
+                                    <div className='mt-3 bg-orange-50 p-3 rounded-lg text-sm text-orange-800 border border-orange-100'>
                                         {booking.specialOccasion && <p><strong>Occasion:</strong> {booking.specialOccasion}</p>}
                                         {booking.specialRequest && <p><strong>Request:</strong> {booking.specialRequest}</p>}
+                                    </div>
+                                )}
+
+                                {(booking.foodOrders && booking.foodOrders.length > 0) && (
+                                    <div className='mt-3 bg-blue-50 p-3 rounded-lg text-sm text-blue-800 border border-blue-100'>
+                                        <h4 className='font-bold mb-2 text-blue-900 border-b border-blue-200 pb-1'>🍲 Pre-Ordered Food:</h4>
+                                        {booking.foodOrders.map((shopOrder, idx) => (
+                                            <div key={idx} className='mb-2 last:mb-0'>
+                                                <ul className='list-disc list-inside space-y-1'>
+                                                    {shopOrder.shopOrderItems.map((item, itemIdx) => (
+                                                        <li key={itemIdx} className='flex justify-between items-center text-blue-900'>
+                                                            <span>{item.name}</span>
+                                                            <span className='font-bold px-2 py-0.5 bg-blue-100 rounded text-xs'>x{item.quantity}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
                             </div>

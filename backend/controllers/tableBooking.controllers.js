@@ -1,6 +1,7 @@
 import TableBooking from "../models/tableBooking.model.js";
 import Shop from "../models/shop.model.js";
 import Table from "../models/table.model.js";
+import Order from "../models/order.model.js";
 
 // Customer books a table online
 export const createOnlineBooking = async (req, res) => {
@@ -136,12 +137,38 @@ export const createWalkInBooking = async (req, res) => {
         res.status(500).json({ message: `Error creating walk-in: ${error.message}` });
     }
 };
-
 // Owner gets all shop bookings
 export const getShopBookings = async (req, res) => {
     try {
         const { shopId } = req.params;
-        const bookings = await TableBooking.find({ shop: shopId }).populate("table").sort({ createdAt: -1 });
+        const bookings = await TableBooking.find({ shop: shopId }).populate("table").sort({ createdAt: -1 }).lean();
+        
+        // Fetch all active dine-in orders for this shop today
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        const activeOrders = await Order.find({
+            "shopOrders.shop": shopId,
+            orderType: "dineIn",
+            createdAt: { $gte: today }
+        }).populate("shopOrders.shopOrderItems.item", "name").lean();
+
+        // Attach orders to bookings
+        for (let booking of bookings) {
+            booking.foodOrders = [];
+            for (let order of activeOrders) {
+                // Match by user ID or table ID
+                if ((booking.user && order.user && booking.user.toString() === order.user.toString()) || 
+                    (booking.table && order.tableId && booking.table._id.toString() === order.tableId.toString())) {
+                    
+                    const shopOrder = order.shopOrders.find(so => so.shop.toString() === shopId.toString());
+                    if (shopOrder && shopOrder.status !== "delivered") {
+                        booking.foodOrders.push(shopOrder);
+                    }
+                }
+            }
+        }
+
         res.status(200).json(bookings);
     } catch (error) {
         res.status(500).json({ message: `Error fetching bookings: ${error.message}` });
