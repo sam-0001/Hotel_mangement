@@ -6,6 +6,7 @@ import { FaCalendarAlt, FaClock, FaUsers, FaChair, FaPhone } from "react-icons/f
 import axios from 'axios';
 import { serverUrl } from '../App';
 import { setShopBookings, setShopTables } from '../redux/tableSlice';
+import { formatTime12Hour } from '../utils/timeFormat';
 
 function OwnerTableBookings() {
     const { myShopData } = useSelector(state => state.owner);
@@ -109,7 +110,7 @@ function OwnerTableBookings() {
                                 </p>
                                 <div className='flex flex-wrap items-center gap-4 text-sm font-medium text-gray-600'>
                                     <span className='flex items-center gap-1.5'><FaCalendarAlt className="text-[#ff4d2d]" /> {new Date(booking.date).toLocaleDateString()}</span>
-                                    <span className='flex items-center gap-1.5'><FaClock className="text-[#ff4d2d]" /> {booking.time}</span>
+                                    <span className='flex items-center gap-1.5'><FaClock className="text-[#ff4d2d]" /> {formatTime12Hour(booking.time)}</span>
                                     <span className='flex items-center gap-1.5'><FaUsers className="text-[#ff4d2d]" /> {booking.guests}</span>
                                     <span className='flex items-center gap-1.5'><FaChair className="text-[#ff4d2d]" /> {booking.preference}</span>
                                 </div>

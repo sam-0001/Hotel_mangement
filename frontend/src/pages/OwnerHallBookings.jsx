@@ -5,6 +5,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { FaClipboardList, FaCheck, FaTimes } from "react-icons/fa";
 import axios from 'axios';
 import { serverUrl } from '../App';
+import { formatTime12Hour } from '../utils/timeFormat';
 
 function OwnerHallBookings() {
     const { myShopData } = useSelector(state => state.owner);
@@ -66,7 +67,7 @@ function OwnerHallBookings() {
                                         <div className='text-sm text-gray-600 mt-1'>
                                             <p><span className='font-medium'>Customer:</span> {booking.customerName} ({booking.customerMobile})</p>
                                             <p><span className='font-medium'>Date:</span> {new Date(booking.eventDate).toLocaleDateString()}</p>
-                                            <p><span className='font-medium'>Time:</span> {booking.startTime} - {booking.endTime}</p>
+                                            <p><span className='font-medium'>Time:</span> {formatTime12Hour(booking.startTime)} - {formatTime12Hour(booking.endTime)}</p>
                                             <p><span className='font-medium'>Event Type:</span> {booking.eventType}</p>
                                         </div>
                                     </div>

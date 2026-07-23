@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaCalendarAlt, FaClock, FaUsers, FaChair } from "react-icons/fa";
+import { formatTime12Hour } from '../utils/timeFormat';
 
 function UserTableBookingCard({ booking }) {
     const statusColor = {
@@ -22,7 +23,7 @@ function UserTableBookingCard({ booking }) {
                     <p className='text-sm text-gray-500 font-medium'>Table Reservation</p>
                     <div className='flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600'>
                         <span className='flex items-center gap-1'><FaCalendarAlt className="text-[#ff4d2d]" /> {new Date(booking.date).toLocaleDateString()}</span>
-                        <span className='flex items-center gap-1'><FaClock className="text-[#ff4d2d]" /> {booking.time}</span>
+                        <span className='flex items-center gap-1'><FaClock className="text-[#ff4d2d]" /> {formatTime12Hour(booking.time)}</span>
                         <span className='flex items-center gap-1'><FaUsers className="text-[#ff4d2d]" /> {booking.guests} Guests</span>
                         <span className='flex items-center gap-1'><FaChair className="text-[#ff4d2d]" /> {booking.preference}</span>
                     </div>
