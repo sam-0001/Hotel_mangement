@@ -10,8 +10,8 @@ import { setMyOrders, updateOrderStatus, updateRealtimeOrderStatus } from '../re
 import useGetMyHallBookings from '../hooks/useGetMyHallBookings';
 import { useState } from 'react';
 
-
 function MyOrders() {
+  const [searchQuery, setSearchQuery] = useState("");
   const { userData, myOrders} = useSelector(state => state.user)
   const { myBookings } = useSelector(state => state.table)
   const { myHallBookings } = useGetMyHallBookings()
@@ -25,13 +25,25 @@ function MyOrders() {
     <div className='"w-full min-h-screen bg-[#fff9f6] flex justify-center px-4'>
       <div className='w-full max-w-[800px] p-4'>
 
-        <div className='flex items-center justify-between mb-6 '>
+        <div className='flex flex-wrap items-center justify-between mb-6 gap-4'>
           <div className='flex items-center gap-[20px]'>
             <div className=' z-[10] cursor-pointer' onClick={() => navigate("/")}>
               <IoIosArrowRoundBack size={35} className='text-[#ff4d2d]' />
             </div>
             <h1 className='text-2xl font-bold  text-start'>My Activity</h1>
           </div>
+
+          {userData?.role === 'owner' && activeTab === 'orders' && (
+              <div className='flex items-center gap-4 flex-1 md:max-w-sm'>
+                  <input 
+                      type="text" 
+                      placeholder="Search by Order ID or Customer Name..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-[#ff4d2d]"
+                  />
+              </div>
+          )}
         </div>
 
         {userData?.role === 'user' && (
@@ -58,7 +70,15 @@ function MyOrders() {
         )}
 
         <div className='space-y-6'>
-          {activeTab === 'orders' && myOrders?.map((order,index)=>(
+          {activeTab === 'orders' && myOrders
+            ?.filter(order => {
+                if (userData?.role !== 'owner' || !searchQuery) return true;
+                const query = searchQuery.toLowerCase();
+                const customerName = order.user?.fullName?.toLowerCase() || "";
+                const orderId = order._id?.toLowerCase() || "";
+                return customerName.includes(query) || orderId.includes(query);
+            })
+            .map((order,index)=>(
             userData.role=="user" ?
             (
               <UserOrderCard data={order} key={index}/>

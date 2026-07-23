@@ -233,8 +233,8 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
                 <MdDeliveryDining className='text-green-600 text-xl' />
               </span>
               <div >
-                <p className='font-medium text-gray-800'>Cash On Delivery</p>
-                <p className='text-xs text-gray-500'>Pay when your food arrives</p>
+                <p className='font-medium text-gray-800'>{orderType === "dineIn" ? "Pay at Restaurant" : "Cash On Delivery"}</p>
+                <p className='text-xs text-gray-500'>{orderType === "dineIn" ? "Pay after your meal" : "Pay when your food arrives"}</p>
               </div>
 
             </div>
@@ -270,10 +270,12 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
   <span>Subtotal</span>
   <span>{totalAmount}</span>
 </div>
-<div className='flex justify-between text-gray-700'>
-  <span>Delivery Fee</span>
-  <span>{deliveryFee==0?"Free":deliveryFee}</span>
-</div>
+{orderType !== "dineIn" && (
+  <div className='flex justify-between text-gray-700'>
+    <span>Delivery Fee</span>
+    <span>{deliveryFee==0?"Free":deliveryFee}</span>
+  </div>
+)}
 <div className='flex justify-between text-lg font-bold text-[#ff4d2d] pt-2'>
     <span>Total</span>
   <span>{AmountWithDeliveryFee}</span>

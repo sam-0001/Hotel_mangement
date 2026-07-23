@@ -15,6 +15,7 @@ function OwnerTableBookings() {
     const dispatch = useDispatch();
 
     const [showWalkinModal, setShowWalkinModal] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const [walkinData, setWalkinData] = useState({
         customerName: "", customerMobile: "", guests: 2, preference: "Any", smoking: false
     });
@@ -97,15 +98,32 @@ function OwnerTableBookings() {
                         <div className='cursor-pointer bg-white p-2 rounded-full shadow hover:bg-gray-50' onClick={() => navigate("/")}>
                             <IoIosArrowRoundBack size={30} className='text-[#ff4d2d]' />
                         </div>
-                        <h1 className='text-3xl font-bold text-gray-800'>Reservations & Walk-ins</h1>
+                        <h1 className='text-3xl font-bold text-gray-800'>Reservations</h1>
                     </div>
-                    <button onClick={() => setShowWalkinModal(true)} className='flex items-center gap-2 bg-[#ff4d2d] text-white px-5 py-2.5 rounded-lg font-bold shadow hover:bg-orange-600 transition'>
+                    
+                    <div className='flex items-center gap-4 flex-1 md:max-w-sm'>
+                        <input 
+                            type="text" 
+                            placeholder="Search name or mobile..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-[#ff4d2d]"
+                        />
+                    </div>
+
+                    <button onClick={() => setShowWalkinModal(true)} className='flex items-center gap-2 bg-[#ff4d2d] text-white px-5 py-2.5 rounded-lg font-bold shadow hover:bg-orange-600 transition whitespace-nowrap'>
                         Walk-in Guest
                     </button>
                 </div>
 
                 <div className='space-y-4'>
-                    {shopBookings.map((booking) => (
+                    {shopBookings
+                        .filter(booking => {
+                            if (!searchQuery) return true;
+                            const query = searchQuery.toLowerCase();
+                            return booking.customerName?.toLowerCase().includes(query) || booking.customerMobile?.includes(query);
+                        })
+                        .map((booking) => (
                         <div key={booking._id} className='bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6'>
                             <div className='flex-1'>
                                 <div className='flex items-center gap-3 mb-2'>
