@@ -47,11 +47,22 @@ function OwnerTableBookings() {
     };
 
     const updateStatus = async (bookingId, status, tableId = null) => {
+        // Optimistic UI Update: Make it feel instant
+        const previousBookings = [...shopBookings];
+        const optimisticBookings = shopBookings.map(b => 
+            b._id === bookingId ? { ...b, status: status } : b
+        );
+        dispatch(setShopBookings(optimisticBookings));
+
         try {
             await axios.patch(`${serverUrl}/api/table-booking/update/${bookingId}`, { status, tableId }, { withCredentials: true });
+            
+            // Silently fetch fresh data in background to ensure consistency
             fetchBookings();
             fetchTables();
         } catch (error) {
+            // Revert if API fails
+            dispatch(setShopBookings(previousBookings));
             console.log(error);
             alert(error.response?.data?.message || "Error updating booking status");
         }
