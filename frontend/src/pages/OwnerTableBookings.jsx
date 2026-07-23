@@ -129,19 +129,13 @@ function OwnerTableBookings() {
                                     Table: <span className='text-[#ff4d2d]'>{booking.table ? booking.table.tableNumber : "None"}</span>
                                 </div>
                                 <div className='flex flex-col gap-2'>
-                                    {booking.status !== 'Completed' && booking.status !== 'Cancelled' && (
+                                    {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
                                         <>
                                             <button 
                                                 onClick={() => updateStatus(booking._id, 'Arrived')} 
                                                 className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded text-sm transition'
                                             >
                                                 Confirm
-                                            </button>
-                                            <button 
-                                                onClick={() => updateStatus(booking._id, 'Completed')} 
-                                                className='bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-sm transition'
-                                            >
-                                                Completed
                                             </button>
                                             <button 
                                                 onClick={() => updateStatus(booking._id, 'Cancelled')} 
@@ -151,7 +145,15 @@ function OwnerTableBookings() {
                                             </button>
                                         </>
                                     )}
-                                    {(booking.status === 'Completed' || booking.status === 'Cancelled') && (
+                                    {booking.status === 'Arrived' && (
+                                        <button 
+                                            onClick={() => updateStatus(booking._id, 'Completed')} 
+                                            className='bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-sm transition'
+                                        >
+                                            Completed
+                                        </button>
+                                    )}
+                                    {(booking.status === 'Completed' || booking.status === 'Cancelled' || booking.status === 'No-Show') && (
                                         <div className={`text-center py-2 px-4 rounded font-bold text-sm ${booking.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                             {booking.status}
                                         </div>
