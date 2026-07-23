@@ -17,6 +17,7 @@ function OwnerTableManagement() {
     const [tableNumber, setTableNumber] = useState("");
     const [capacity, setCapacity] = useState(2);
     const [floor, setFloor] = useState("Main Floor");
+    const [isSmokingZone, setIsSmokingZone] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -44,12 +45,14 @@ function OwnerTableManagement() {
                 shopId: myShopData._id,
                 tableNumber,
                 capacity,
-                floor
+                floor,
+                isSmokingZone
             }, { withCredentials: true });
             
             setShowAddModal(false);
             setTableNumber("");
             setCapacity(2);
+            setIsSmokingZone(false);
             fetchTables();
         } catch (error) {
             console.log(error);
@@ -99,7 +102,7 @@ function OwnerTableManagement() {
                             <div className='flex justify-between items-start mb-4'>
                                 <div>
                                     <h2 className='text-2xl font-bold text-gray-800 flex items-center gap-2'>
-                                        <FaChair className="text-gray-400" /> {table.tableNumber}
+                                        <FaChair className="text-gray-400" /> {table.tableNumber} {table.isSmokingZone && <span className="text-sm text-red-500 ml-2" title="Smoking Zone">🚬</span>}
                                     </h2>
                                     <p className='text-sm text-gray-500 font-medium'>{table.floor}</p>
                                 </div>
@@ -174,6 +177,10 @@ function OwnerTableManagement() {
                                         <label className='block text-sm font-medium text-gray-700 mb-1'>Floor/Area</label>
                                         <input type="text" required value={floor} onChange={e=>setFloor(e.target.value)} placeholder="Main Floor" className='w-full border rounded-lg p-2.5 outline-none focus:border-[#ff4d2d]' />
                                     </div>
+                                </div>
+                                <div className='flex items-center gap-2 mt-1'>
+                                    <input type="checkbox" id="smokingZone" checked={isSmokingZone} onChange={e=>setIsSmokingZone(e.target.checked)} className='w-4 h-4 text-[#ff4d2d] focus:ring-[#ff4d2d] border-gray-300 rounded' />
+                                    <label htmlFor="smokingZone" className='text-sm font-medium text-gray-700'>This table is in a Smoking Zone</label>
                                 </div>
                                 
                                 <div className='flex gap-3 mt-4'>

@@ -11,6 +11,7 @@ const tableSchema = new mongoose.Schema({
         enum: ["Available", "Reserved", "Occupied", "Cleaning", "Maintenance", "Disabled"],
         default: "Available"
     },
+    isSmokingZone: { type: Boolean, default: false },
     qrCode: { type: String, default: "" }
 }, { timestamps: true });
 

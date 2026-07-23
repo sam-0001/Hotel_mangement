@@ -4,7 +4,7 @@ import Shop from "../models/shop.model.js";
 // Add new table
 export const addTable = async (req, res) => {
     try {
-        const { shopId, tableNumber, capacity, floor, status } = req.body;
+        const { shopId, tableNumber, capacity, floor, status, isSmokingZone } = req.body;
         const ownerId = req.userId;
 
         // Verify shop exists and belongs to owner
@@ -20,7 +20,8 @@ export const addTable = async (req, res) => {
             tableNumber,
             capacity: capacity || 2,
             floor: floor || "Main Floor",
-            status: status || "Available"
+            status: status || "Available",
+            isSmokingZone: isSmokingZone || false
         });
 
         await newTable.save();
@@ -39,7 +40,7 @@ export const addTable = async (req, res) => {
 export const editTable = async (req, res) => {
     try {
         const { tableId } = req.params;
-        const { tableNumber, capacity, floor, status } = req.body;
+        const { tableNumber, capacity, floor, status, isSmokingZone } = req.body;
         const ownerId = req.userId;
 
         const table = await Table.findOne({ _id: tableId, owner: ownerId });
@@ -49,6 +50,7 @@ export const editTable = async (req, res) => {
         if (capacity) table.capacity = capacity;
         if (floor) table.floor = floor;
         if (status) table.status = status;
+        if (isSmokingZone !== undefined) table.isSmokingZone = isSmokingZone;
 
         await table.save();
         res.status(200).json({ message: "Table updated successfully", table });

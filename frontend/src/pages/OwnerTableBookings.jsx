@@ -98,6 +98,7 @@ function OwnerTableBookings() {
                             <div className='flex-1'>
                                 <div className='flex items-center gap-3 mb-2'>
                                     <h3 className='text-xl font-bold text-gray-800'>{booking.customerName}</h3>
+                                    {booking.smoking && <span className='px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700' title="Smoking Requested">🚬 Smoking</span>}
                                     <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                                         booking.bookingType === 'Online' ? 'bg-blue-100 text-blue-700' :
                                         booking.bookingType === 'Walk-in' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'
@@ -149,7 +150,7 @@ function OwnerTableBookings() {
                                         >
                                             <option value="">-- Assign Table --</option>
                                             {shopTables.filter(t => t.status === "Available" || (booking.table && t._id === booking.table._id)).map(t => (
-                                                <option key={t._id} value={t._id}>{t.tableNumber} ({t.capacity} seats)</option>
+                                                <option key={t._id} value={t._id}>{t.tableNumber} ({t.capacity} seats) {t.isSmokingZone ? '[Smoking]' : ''}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -186,7 +187,7 @@ function OwnerTableBookings() {
                                         <select value={walkinData.tableId} onChange={e=>setWalkinData({...walkinData, tableId: e.target.value})} className='w-full border rounded-lg p-2.5 outline-none focus:border-[#ff4d2d]'>
                                             <option value="">None</option>
                                             {shopTables.filter(t => t.status === "Available").map(t => (
-                                                <option key={t._id} value={t._id}>{t.tableNumber}</option>
+                                                <option key={t._id} value={t._id}>{t.tableNumber} {t.isSmokingZone ? '[Smoking]' : ''}</option>
                                             ))}
                                         </select>
                                     </div>
