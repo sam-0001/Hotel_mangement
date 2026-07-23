@@ -46,19 +46,23 @@ export const createHallBooking = async (req, res) => {
         });
 
         // Check for overlaps including cleaning time
+        const cleaningMins = (hall.cleaningTime || 0) * 60;
+        
         for (const booking of existingBookings) {
             const existingStart = timeToMinutes(booking.startTime);
             const existingEnd = timeToMinutes(booking.endTime);
-            // Cleaning time applies after the existing booking ends
-            const existingEndWithCleaning = existingEnd + (hall.cleaningTime * 60);
+            
+            // A booking occupies the hall from its start time until its end time + cleaning time
+            const existingOccupiedEnd = existingEnd + cleaningMins;
+            const newOccupiedEnd = newEnd + cleaningMins;
 
-            // Two intervals [A, B] and [C, D] overlap if Math.max(A, C) < Math.min(B, D)
-            // But if a booking starts at exactly the cleaning end time, it's valid.
-            const overlap = Math.max(newStart, existingStart) < Math.min(newEnd, existingEndWithCleaning);
+            // Overlap occurs if the max of the start times is LESS than the min of the occupied end times
+            const overlap = Math.max(newStart, existingStart) < Math.min(newOccupiedEnd, existingOccupiedEnd);
 
             if (overlap) {
+                const overlapEndStr = `${Math.floor(existingOccupiedEnd/60).toString().padStart(2,'0')}:${String(existingOccupiedEnd%60).padStart(2,'0')}`;
                 return res.status(400).json({ 
-                    message: `This hall is already booked or undergoing cleaning from ${booking.startTime} to ${Math.floor(existingEndWithCleaning/60)}:${String(existingEndWithCleaning%60).padStart(2,'0')}. Please select another time.` 
+                    message: `This hall is already booked or requires cleaning during this time. Please select a time before ${booking.startTime} or after ${overlapEndStr}.` 
                 });
             }
         }

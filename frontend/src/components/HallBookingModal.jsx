@@ -12,6 +12,7 @@ function HallBookingModal({ shopId, hall, onClose }) {
     const [endTime, setEndTime] = useState('');
     const [eventType, setEventType] = useState('Birthday');
     const [loading, setLoading] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const eventTypes = ["Birthday", "Wedding", "Corporate Meeting", "Anniversary", "Other"];
 
@@ -46,8 +47,7 @@ function HallBookingModal({ shopId, hall, onClose }) {
                 totalAmount
             }, { withCredentials: true });
 
-            alert("Hall booking request sent successfully!");
-            onClose();
+            setIsSuccess(true);
         } catch (error) {
             console.error(error);
             alert(error.response?.data?.message || "Failed to book hall. There might be a time overlap or invalid time.");
@@ -69,89 +69,105 @@ function HallBookingModal({ shopId, hall, onClose }) {
                     </p>
                 </div>
                 
-                <form onSubmit={handleBooking} className='p-6 space-y-5'>
-                    <div className='space-y-4'>
-                        <div>
-                            <label className='flex items-center gap-2 text-sm font-bold text-gray-700 mb-2'>
-                                <FaCalendarAlt className='text-blue-500' /> Event Date
-                            </label>
-                            <input 
-                                type="date" 
-                                required 
-                                value={eventDate} 
-                                onChange={(e) => setEventDate(e.target.value)} 
-                                min={new Date().toISOString().split('T')[0]}
-                                className='w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition' 
-                            />
+                {isSuccess ? (
+                    <div className="flex flex-col items-center justify-center p-8 text-center space-y-4 bg-white rounded-b-2xl">
+                        <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-2">
+                            <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                            </svg>
                         </div>
-                        
-                        <div className='grid grid-cols-2 gap-4'>
-                            <div>
-                                <label className='flex items-center gap-2 text-sm font-bold text-gray-700 mb-2'>
-                                    <FaClock className='text-blue-500' /> Start Time
-                                </label>
-                                <input 
-                                    type="time" 
-                                    required 
-                                    value={startTime} 
-                                    onChange={(e) => setStartTime(e.target.value)} 
-                                    className='w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition' 
-                                />
-                            </div>
-                            <div>
-                                <label className='flex items-center gap-2 text-sm font-bold text-gray-700 mb-2'>
-                                    <FaClock className='text-blue-500' /> End Time
-                                </label>
-                                <input 
-                                    type="time" 
-                                    required 
-                                    value={endTime} 
-                                    onChange={(e) => setEndTime(e.target.value)} 
-                                    className='w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition' 
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className='flex items-center gap-2 text-sm font-bold text-gray-700 mb-2'>
-                                <FaTags className='text-blue-500' /> Event Type
-                            </label>
-                            <select 
-                                value={eventType} 
-                                onChange={(e) => setEventType(e.target.value)}
-                                className='w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition bg-white'
-                            >
-                                {eventTypes.map(type => (
-                                    <option key={type} value={type}>{type}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className='bg-blue-50 p-4 rounded-xl text-sm text-blue-800 border border-blue-100'>
-                        <p className='font-semibold mb-1'>Booking Rules:</p>
-                        <ul className='list-disc list-inside space-y-1 text-blue-700/80'>
-                            <li>Minimum booking duration: {hall.minBookingDuration} hours</li>
-                            <li>Please allow time for setup & wrap-up</li>
-                        </ul>
-                    </div>
-
-                    <div className='pt-2'>
-                        <button 
-                            type="submit" 
-                            disabled={loading} 
-                            className='w-full bg-blue-600 text-white rounded-xl py-4 font-bold text-lg shadow-lg shadow-blue-200 hover:bg-blue-700 hover:shadow-xl transition disabled:opacity-80 disabled:hover:shadow-none flex items-center justify-center gap-2'
-                        >
-                            {loading && (
-                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            )}
-                            {loading ? "Processing..." : "Confirm Request"}
+                        <h3 className="text-2xl font-bold text-gray-800">Request Sent!</h3>
+                        <p className="text-gray-600">Your hall booking request for <span className="font-semibold text-gray-800">{hall.name}</span> has been sent to the owner for approval.</p>
+                        <p className="text-sm text-gray-500 mt-2">You can check its status in My Orders.</p>
+                        <button onClick={onClose} className="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded-xl transition shadow-lg shadow-blue-200">
+                            Done
                         </button>
                     </div>
-                </form>
+                ) : (
+                    <form onSubmit={handleBooking} className='p-6 space-y-5'>
+                        <div className='space-y-4'>
+                            <div>
+                                <label className='flex items-center gap-2 text-sm font-bold text-gray-700 mb-2'>
+                                    <FaCalendarAlt className='text-blue-500' /> Event Date
+                                </label>
+                                <input 
+                                    type="date" 
+                                    required 
+                                    value={eventDate} 
+                                    onChange={(e) => setEventDate(e.target.value)} 
+                                    min={new Date().toISOString().split('T')[0]}
+                                    className='w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition' 
+                                />
+                            </div>
+                            
+                            <div className='grid grid-cols-2 gap-4'>
+                                <div>
+                                    <label className='flex items-center gap-2 text-sm font-bold text-gray-700 mb-2'>
+                                        <FaClock className='text-blue-500' /> Start Time
+                                    </label>
+                                    <input 
+                                        type="time" 
+                                        required 
+                                        value={startTime} 
+                                        onChange={(e) => setStartTime(e.target.value)} 
+                                        className='w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition' 
+                                    />
+                                </div>
+                                <div>
+                                    <label className='flex items-center gap-2 text-sm font-bold text-gray-700 mb-2'>
+                                        <FaClock className='text-blue-500' /> End Time
+                                    </label>
+                                    <input 
+                                        type="time" 
+                                        required 
+                                        value={endTime} 
+                                        onChange={(e) => setEndTime(e.target.value)} 
+                                        className='w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition' 
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className='flex items-center gap-2 text-sm font-bold text-gray-700 mb-2'>
+                                    <FaTags className='text-blue-500' /> Event Type
+                                </label>
+                                <select 
+                                    value={eventType} 
+                                    onChange={(e) => setEventType(e.target.value)}
+                                    className='w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition bg-white'
+                                >
+                                    {eventTypes.map(type => (
+                                        <option key={type} value={type}>{type}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className='bg-blue-50 p-4 rounded-xl text-sm text-blue-800 border border-blue-100'>
+                            <p className='font-semibold mb-1'>Booking Rules:</p>
+                            <ul className='list-disc list-inside space-y-1 text-blue-700/80'>
+                                <li>Minimum booking duration: {hall.minBookingDuration} hours</li>
+                                <li>Please allow time for setup & wrap-up</li>
+                            </ul>
+                        </div>
+
+                        <div className='pt-2'>
+                            <button 
+                                type="submit" 
+                                disabled={loading} 
+                                className='w-full bg-blue-600 text-white rounded-xl py-4 font-bold text-lg shadow-lg shadow-blue-200 hover:bg-blue-700 hover:shadow-xl transition disabled:opacity-80 disabled:hover:shadow-none flex items-center justify-center gap-2'
+                            >
+                                {loading && (
+                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                )}
+                                {loading ? "Processing..." : "Confirm Request"}
+                            </button>
+                        </div>
+                    </form>
+                )}
             </div>
         </div>
     );
