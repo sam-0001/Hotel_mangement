@@ -88,7 +88,10 @@ const userSlice = createSlice({
     },
 
     removeCartItem: (state, action) => {
-      state.cartItems = state.cartItems.filter(i => i.id !== action.payload)
+      const index = state.cartItems.findIndex(i => i.id == action.payload);
+      if (index !== -1) {
+        state.cartItems.splice(index, 1);
+      }
       state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
       localStorage.setItem("cartItems", JSON.stringify(current(state.cartItems)));
       localStorage.setItem("cartTotal", state.totalAmount);
