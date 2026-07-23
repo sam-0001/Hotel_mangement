@@ -12,8 +12,9 @@ function CartItemCard({data}) {
       const handleDecrease=(id,currentQty)=>{
         if(currentQty>1){
   dispatch(updateQuantity({id,quantity:currentQty-1}))
+        } else {
+          dispatch(removeCartItem(id))
         }
-        
     }
   return (
     <div className='flex items-center justify-between bg-white p-4 rounded-xl shadow border'>
