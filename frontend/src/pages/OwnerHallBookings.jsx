@@ -30,10 +30,17 @@ function OwnerHallBookings() {
     };
 
     const handleUpdateStatus = async (bookingId, status) => {
+        // Optimistic UI update
+        const previousBookings = [...bookings];
+        setBookings(bookings.map(b => b._id === bookingId ? { ...b, status } : b));
+
         try {
             await axios.put(`${serverUrl}/api/hall-booking/update-status/${bookingId}`, { status }, { withCredentials: true });
+            // Silently fetch fresh data to ensure consistency
             fetchBookings();
         } catch (error) {
+            // Revert on error
+            setBookings(previousBookings);
             console.log(error);
             alert("Failed to update status");
         }

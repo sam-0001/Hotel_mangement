@@ -27,12 +27,10 @@ function TableBookingModal({ shopId, onClose, onSuccess }) {
             }, { withCredentials: true });
             
             setSuccessMessage("Table booked successfully! You can view it in My Orders.");
-            setTimeout(() => {
-                if (onSuccess) {
-                    onSuccess(result.data.booking || true);
-                }
-                onClose();
-            }, 2000);
+            if (onSuccess) {
+                onSuccess(result.data.booking || true);
+            }
+            onClose();
         } catch (error) {
             setErrorMessage(error.response?.data?.message || "Failed to book table");
         } finally {
@@ -106,8 +104,14 @@ function TableBookingModal({ shopId, onClose, onSuccess }) {
                             <textarea value={specialRequest} onChange={(e)=>setSpecialRequest(e.target.value)} placeholder="Any special arrangements?" className="w-full border rounded-lg p-2 outline-none focus:border-[#ff4d2d] h-20 resize-none"></textarea>
                         </div>
 
-                        <button disabled={loading} type="submit" className="w-full bg-[#ff4d2d] hover:bg-[#e64323] text-white font-bold py-3 rounded-lg transition mt-4 disabled:opacity-50">
-                            {loading ? "Booking..." : "Confirm Booking"}
+                        <button disabled={loading} type="submit" className="w-full bg-[#ff4d2d] hover:bg-[#e64323] text-white font-bold py-3 rounded-lg transition mt-4 disabled:opacity-70 flex items-center justify-center gap-2">
+                            {loading && (
+                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            )}
+                            {loading ? "Processing..." : "Confirm Booking"}
                         </button>
                     </form>
                 </div>
