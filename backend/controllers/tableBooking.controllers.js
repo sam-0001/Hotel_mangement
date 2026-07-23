@@ -141,7 +141,7 @@ export const createWalkInBooking = async (req, res) => {
 export const getShopBookings = async (req, res) => {
     try {
         const { shopId } = req.params;
-        const bookings = await TableBooking.find({ shop: shopId }).populate("table").sort({ date: -1, time: 1 });
+        const bookings = await TableBooking.find({ shop: shopId }).populate("table").sort({ createdAt: -1 });
         res.status(200).json(bookings);
     } catch (error) {
         res.status(500).json({ message: `Error fetching bookings: ${error.message}` });
