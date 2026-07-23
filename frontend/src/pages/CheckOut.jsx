@@ -36,6 +36,7 @@ function CheckOut() {
   const [orderType, setOrderType] = useState("delivery")
   const [showBookingModal, setShowBookingModal] = useState(false)
   const [isTableBooked, setIsTableBooked] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   
   useEffect(() => {
     const info = localStorage.getItem('dineInTable');
@@ -88,14 +89,16 @@ function CheckOut() {
     }
   }
 
-  const handlePlaceOrder=async () => {
+  const handlePlaceOrder=async()=>{
+    if(isLoading) return;
+    setIsLoading(true);
     try {
-      const payload = {
+      const payload={
+        cartItems,
         paymentMethod,
         totalAmount:AmountWithDeliveryFee,
-        cartItems,
-        orderType: orderType
-      };
+        orderType
+      }
 
       if (orderType === "dineIn" && dineInInfo) {
           payload.tableId = dineInInfo.tableId;
@@ -123,6 +126,8 @@ function CheckOut() {
     } catch (error) {
       console.log(error)
       alert(error?.response?.data?.message || "Failed to place order. Please check your inputs or try again.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -293,9 +298,9 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
         <button 
           className='w-full bg-[#ff4d2d] hover:bg-[#e64526] text-white py-3 rounded-xl font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition' 
           onClick={handlePlaceOrder}
-          disabled={orderType === "dineIn" && !isTableBooked}
+          disabled={(orderType === "dineIn" && !isTableBooked) || isLoading}
         >
-          {paymentMethod === "cod" ? "Place Order" : "Pay & Place Order"}
+          {isLoading ? "Processing..." : (paymentMethod === "cod" ? "Place Order" : "Pay & Place Order")}
         </button>
 
       </div>
