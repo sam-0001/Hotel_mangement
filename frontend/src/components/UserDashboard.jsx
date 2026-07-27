@@ -4,6 +4,7 @@ import { categories } from '../category'
 import CategoryCard from './CategoryCard'
 import { FaCircleChevronLeft } from "react-icons/fa6";
 import { FaCircleChevronRight } from "react-icons/fa6";
+import { FaMapMarkerAlt } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import FoodCard from './FoodCard';
 import { useNavigate } from 'react-router-dom';
@@ -125,8 +126,8 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
 
 
 
-      <div className='w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]'>
-       <h1 className='text-gray-800 text-2xl sm:text-3xl'>
+      <div className='w-full max-w-6xl flex flex-col gap-5 items-start p-[10px] pb-10'>
+       <h1 className='text-gray-800 text-2xl sm:text-3xl font-bold'>
         Suggested Food Items
        </h1>
 
@@ -139,10 +140,37 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
   <FoodCard key={index} data={item}/>
 ))}
 </div>
-
-
       </div>
 
+      <div className='w-full bg-white mt-auto py-12 border-t border-gray-200 flex flex-col items-center justify-center gap-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]'>
+        <div className='text-center'>
+          <h2 className='text-2xl md:text-3xl font-extrabold text-gray-800 tracking-tight'>Locate Us on Maps</h2>
+          <p className='text-gray-500 mt-2'>Visit The Hometown Kitchen n cafe Restaurant in person!</p>
+        </div>
+
+        <div className='w-[90%] max-w-[400px] aspect-square rounded-2xl overflow-hidden shadow-md border border-gray-200 bg-gray-100'>
+          <iframe 
+            title="Restaurant Location"
+            src="https://maps.google.com/maps?q=The+Hometown+Kitchen+n+cafe+Restaurant,+Yavatmal&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+            width="100%" 
+            height="100%" 
+            frameBorder="0" 
+            style={{ border: 0 }} 
+            allowFullScreen="" 
+            aria-hidden="false" 
+            tabIndex="0">
+          </iframe>
+        </div>
+
+        <a 
+          href="https://maps.app.goo.gl/mANDxbKZhdFRii8H8?g_st=iw" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className='flex items-center gap-2 bg-[#ff4d2d] hover:bg-[#e64526] text-white px-8 py-4 rounded-full font-bold shadow-lg transition-transform hover:scale-105 mt-2'
+        >
+          <FaMapMarkerAlt size={22} /> Get Directions
+        </a>
+      </div>
 
     </div>
   )
