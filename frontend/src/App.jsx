@@ -29,6 +29,8 @@ import OwnerTableBookings from './pages/OwnerTableBookings'
 import ShopHalls from './pages/ShopHalls'
 import OwnerHallManagement from './pages/OwnerHallManagement'
 import OwnerHallBookings from './pages/OwnerHallBookings'
+import AboutUs from './pages/AboutUs'
+import ContactUs from './pages/ContactUs'
 import { useEffect } from 'react'
 
 import { ClipLoader } from 'react-spinners'
@@ -89,6 +91,8 @@ useUpdateLocation()
 <Route path='/owner/table-bookings' element={userData?.role==='owner'?<OwnerTableBookings/>:<Navigate to={"/"}/>}/>
 <Route path='/owner/halls' element={userData?.role==='owner'?<OwnerHallManagement/>:<Navigate to={"/"}/>}/>
 <Route path='/owner/hall-bookings' element={userData?.role==='owner'?<OwnerHallBookings/>:<Navigate to={"/"}/>}/>
+<Route path='/about' element={<AboutUs/>}/>
+<Route path='/contact' element={<ContactUs/>}/>
    </Routes>
       <CartBottomBar />
   </>

@@ -6,16 +6,26 @@ import { FaLocationDot, FaStore } from "react-icons/fa6";
 import { FaCalendarAlt } from "react-icons/fa";
 
 function DineInRestaurants() {
-    const { shopInMyCity } = useSelector(state => state.user);
+    const { shopInMyCity, userData } = useSelector(state => state.user);
     const navigate = useNavigate();
 
     return (
         <div className='w-full min-h-screen bg-[#fff9f6] flex flex-col items-center'>
             <Nav />
             <div className='w-full max-w-6xl px-4 py-8 mt-[80px]'>
-                <div className='mb-8'>
-                    <h1 className='text-3xl md:text-4xl font-extrabold text-gray-800 mb-2'>Dine-In Reservations</h1>
-                    <p className='text-gray-600 text-lg'>Discover and book the best tables in town for your perfect meal.</p>
+                <div className='mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4'>
+                    <div>
+                        <h1 className='text-3xl md:text-4xl font-extrabold text-gray-800 mb-2'>Dine-In Reservations</h1>
+                        <p className='text-gray-600 text-lg'>Discover and book the best tables in town for your perfect meal.</p>
+                    </div>
+                    {userData && (
+                        <button 
+                            onClick={() => navigate('/my-orders', { state: { tab: 'bookings' } })}
+                            className='bg-white text-[#ff4d2d] border-2 border-[#ff4d2d] hover:bg-orange-50 font-bold py-2 px-6 rounded-xl transition shadow-sm'
+                        >
+                            My Bookings
+                        </button>
+                    )}
                 </div>
 
                 {shopInMyCity && shopInMyCity.length > 0 ? (

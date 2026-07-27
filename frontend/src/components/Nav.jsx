@@ -110,11 +110,11 @@ handleSearchItems()
 
                 {(!userData || userData.role == "user") && (
                     <div className='hidden lg:flex items-center gap-4'>
-                        <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={()=>navigate("/dine-in")}>
-                            Book Table
+                        <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={()=>navigate("/about")}>
+                            About
                         </button>
-                        <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={()=>navigate("/halls")}>
-                            Book Hall
+                        <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={()=>navigate("/contact")}>
+                            Contact
                         </button>
                     </div>
                 )}
@@ -141,8 +141,8 @@ handleSearchItems()
                     ${userData.role=="deliveryBoy"?"md:right-[20%] lg:right-[40%]":"md:right-[10%] lg:right-[25%]"} w-[180px] bg-white shadow-2xl rounded-xl p-[20px] flex flex-col gap-[10px] z-[9999]`}>
                     <div className='text-[17px] font-semibold'>{userData.fullName}</div>
                     {userData.role=="user" && <div className='md:hidden text-[#ff4d2d] font-semibold cursor-pointer' onClick={()=>navigate("/my-orders")}>My Orders</div>}
-                    {userData.role=="user" && <div className='lg:hidden text-gray-700 font-semibold cursor-pointer hover:text-[#ff4d2d]' onClick={()=>navigate("/dine-in")}>Book Table</div>}
-                    {userData.role=="user" && <div className='lg:hidden text-gray-700 font-semibold cursor-pointer hover:text-[#ff4d2d]' onClick={()=>navigate("/halls")}>Book Hall</div>}
+                    {userData.role=="user" && <div className='lg:hidden text-gray-700 font-semibold cursor-pointer hover:text-[#ff4d2d]' onClick={()=>navigate("/about")}>About</div>}
+                    {userData.role=="user" && <div className='lg:hidden text-gray-700 font-semibold cursor-pointer hover:text-[#ff4d2d]' onClick={()=>navigate("/contact")}>Contact</div>}
                     <div className='text-[#ff4d2d] font-semibold cursor-pointer' onClick={handleLogOut}>Log Out</div>
                 </div>}
 
