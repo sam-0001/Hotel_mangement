@@ -22,11 +22,26 @@ function TableBookingModal({ shopId, onClose, onSuccess }) {
         e.preventDefault();
         setLoading(true);
         setErrorMessage("");
+        
+        const useWhatsAppFlow = true; // Set to false to disable WhatsApp redirection
+
         try {
             const result = await axios.post(`${serverUrl}/api/table-booking/book`, {
                 shopId, date, time, guests, preference, smoking, specialOccasion, specialRequest, customerName, customerMobile
             }, { withCredentials: true });
             
+            if (useWhatsAppFlow) {
+               try {
+                   let message = `*New Table Booking!*\n\n*Customer Info*\nName: ${customerName}\nMobile: ${customerMobile}\n\n*Booking Details*\nDate: ${date}\nTime: ${time}\nGuests: ${guests}\nPreference: ${preference}\nSmoking: ${smoking ? 'Yes' : 'No'}\nOccasion: ${specialOccasion || 'None'}\nRequest: ${specialRequest || 'None'}`;
+                   
+                   const ownerMobile = "917350484629"; 
+                   const whatsappUrl = `https://wa.me/${ownerMobile}?text=${encodeURIComponent(message)}`;
+                   window.open(whatsappUrl, "_blank");
+               } catch (err) {
+                   console.error("WhatsApp redirection failed", err);
+               }
+            }
+
             setIsSuccess(true);
             if (onSuccess) {
                 onSuccess(result.data.booking || true);

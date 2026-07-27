@@ -93,48 +93,8 @@ function CheckOut() {
     if(isLoading) return;
     setIsLoading(true);
 
-    // NEW WHATSAPP FLOW
-    // Set to false to revert to the old flow
-    const useWhatsAppFlow = true; 
+    const useWhatsAppFlow = true; // Set to false to disable WhatsApp redirection
 
-    if (useWhatsAppFlow) {
-      try {
-        let itemsText = cartItems.map(item => `${item.name} x ${item.quantity} = ₹${item.price * item.quantity}`).join("\n");
-        let customerInfo = `*Customer Info*\nName: ${userData?.fullName || 'Customer'}\nPhone: ${userData?.mobile || 'N/A'}`;
-        let orderDetails = `*Order Details*\nOrder Type: ${orderType === 'dineIn' ? 'Dine-In' : 'Delivery'}\nPayment Method: ${paymentMethod === 'cod' ? 'Cash On Delivery' : 'Online'}\n`;
-        
-        if (orderType === 'delivery') {
-           orderDetails += `Delivery Address: ${addressInput}\nMap Link: https://www.google.com/maps/search/?api=1&query=${location?.lat},${location?.lon}\n`;
-        } else if (orderType === 'dineIn' && dineInInfo) {
-           orderDetails += `Table ID: ${dineInInfo.tableId}\n`;
-        }
-        
-        let billDetails = `*Bill Summary*\nSubtotal: ₹${totalAmount}\nDelivery Fee: ${deliveryFee === 0 ? 'Free' : '₹' + deliveryFee}\nTotal: ₹${AmountWithDeliveryFee}`;
-        
-        let fullMessage = `*New Order!*\n\n${customerInfo}\n\n${orderDetails}\n*Items*\n${itemsText}\n\n${billDetails}`;
-
-        // Get owner mobile if available in cartItems shop object, otherwise fallback to placeholder
-        // Note: Please replace "91YOURNUMBERHERE" with default owner number if owner mobile is not populated.
-        const ownerMobile = cartItems[0]?.shop?.owner?.mobile || cartItems[0]?.shop?.mobile || "917350484629"; 
-        
-        const whatsappUrl = `https://wa.me/${ownerMobile}?text=${encodeURIComponent(fullMessage)}`;
-        
-        // Open WhatsApp
-        window.open(whatsappUrl, "_blank");
-
-        // Clear cart as now
-        dispatch(clearCart());
-        navigate("/order-placed");
-      } catch (error) {
-        console.error("Error with WhatsApp flow", error);
-        alert("Failed to redirect to WhatsApp.");
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
-
-    // OLD FLOW
     try {
       const payload={
         cartItems,
@@ -156,15 +116,40 @@ function CheckOut() {
 
       const result=await axios.post(`${serverUrl}/api/order/place-order`, payload, {withCredentials:true})
 
+      if (useWhatsAppFlow) {
+        try {
+          let itemsText = cartItems.map(item => `${item.name} x ${item.quantity} = ₹${item.price * item.quantity}`).join("\n");
+          let customerInfo = `*Customer Info*\nName: ${userData?.fullName || 'Customer'}\nPhone: ${userData?.mobile || 'N/A'}`;
+          let orderDetails = `*Order Details*\nOrder Type: ${orderType === 'dineIn' ? 'Dine-In' : 'Delivery'}\nPayment Method: ${paymentMethod === 'cod' ? 'Cash On Delivery' : 'Online'}\n`;
+          
+          if (orderType === 'delivery') {
+             orderDetails += `Delivery Address: ${addressInput}\nMap Link: https://www.google.com/maps/search/?api=1&query=${location?.lat},${location?.lon}\n`;
+          } else if (orderType === 'dineIn' && dineInInfo) {
+             orderDetails += `Table ID: ${dineInInfo.tableId}\n`;
+          }
+          
+          let billDetails = `*Bill Summary*\nSubtotal: ₹${totalAmount}\nDelivery Fee: ${deliveryFee === 0 ? 'Free' : '₹' + deliveryFee}\nTotal: ₹${AmountWithDeliveryFee}`;
+          
+          let fullMessage = `*New Order!*\n\n${customerInfo}\n\n${orderDetails}\n*Items*\n${itemsText}\n\n${billDetails}`;
+
+          const ownerMobile = cartItems[0]?.shop?.owner?.mobile || cartItems[0]?.shop?.mobile || "917350484629"; 
+          
+          const whatsappUrl = `https://wa.me/${ownerMobile}?text=${encodeURIComponent(fullMessage)}`;
+          window.open(whatsappUrl, "_blank");
+        } catch (err) {
+          console.error("WhatsApp redirection failed", err);
+        }
+      }
+
       if(paymentMethod=="cod"){
-      dispatch(addMyOrder(result.data))
-      dispatch(clearCart())
-      navigate("/order-placed")
+        dispatch(addMyOrder(result.data))
+        dispatch(clearCart())
+        navigate("/order-placed")
       }else{
         const orderId=result.data.orderId
         const razorOrder=result.data.razorOrder
-          openRazorpayWindow(orderId,razorOrder)
-       }
+        openRazorpayWindow(orderId,razorOrder)
+      }
     
     } catch (error) {
       console.log(error)

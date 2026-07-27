@@ -46,7 +46,7 @@ function ContactUs() {
                 </div>
                 <div>
                   <h3 className='font-bold text-gray-800 text-lg'>Email Us</h3>
-                  <p className='text-gray-600 text-sm'>support@hometownkitchen.com</p>
+                  <p className='text-gray-600 text-sm break-all'>support@hometownkitchen.com</p>
                 </div>
               </div>
 
