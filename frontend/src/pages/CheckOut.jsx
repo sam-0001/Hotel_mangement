@@ -61,12 +61,36 @@ function CheckOut() {
     getAddressByLatLng(lat, lng)
   }
   const getCurrentLocation = () => {
-      const latitude=userData.location.coordinates[1]
-      const longitude=userData.location.coordinates[0]
-      dispatch(setLocation({ lat: latitude, lon: longitude }))
-      getAddressByLatLng(latitude, longitude)
-   
-
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          dispatch(setLocation({ lat: latitude, lon: longitude }));
+          getAddressByLatLng(latitude, longitude);
+        },
+        (error) => {
+          console.error("Error getting exact location", error);
+          // Fallback to profile location if user denies permission or GPS fails
+          if (userData?.location?.coordinates) {
+            const latitude = userData.location.coordinates[1];
+            const longitude = userData.location.coordinates[0];
+            dispatch(setLocation({ lat: latitude, lon: longitude }));
+            getAddressByLatLng(latitude, longitude);
+          } else {
+            alert("Could not retrieve exact location. Please allow location access or type your address.");
+          }
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      if (userData?.location?.coordinates) {
+        const latitude = userData.location.coordinates[1];
+        const longitude = userData.location.coordinates[0];
+        dispatch(setLocation({ lat: latitude, lon: longitude }));
+        getAddressByLatLng(latitude, longitude);
+      }
+    }
   }
 
   const getAddressByLatLng = async (lat, lng) => {
@@ -123,7 +147,7 @@ function CheckOut() {
           let orderDetails = `*Order Details*\nOrder Type: ${orderType === 'dineIn' ? 'Dine-In' : 'Delivery'}\nPayment Method: ${paymentMethod === 'cod' ? 'Cash On Delivery' : 'Online'}\n`;
           
           if (orderType === 'delivery') {
-             orderDetails += `Delivery Address: ${addressInput}\nMap Link: https://www.google.com/maps/search/?api=1&query=${location?.lat},${location?.lon}\n`;
+             orderDetails += `Delivery Address: ${addressInput}\nMap Link: https://www.google.com/maps/dir/?api=1&destination=${location?.lat},${location?.lon}\n`;
           } else if (orderType === 'dineIn' && dineInInfo) {
              orderDetails += `Table ID: ${dineInInfo.tableId}\n`;
           }
