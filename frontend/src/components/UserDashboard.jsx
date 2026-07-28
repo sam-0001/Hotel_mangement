@@ -4,7 +4,7 @@ import { categories } from '../category'
 import CategoryCard from './CategoryCard'
 import { FaCircleChevronLeft } from "react-icons/fa6";
 import { FaCircleChevronRight } from "react-icons/fa6";
-import { FaMapMarkerAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaWhatsapp, FaEnvelope, FaPhone } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import FoodCard from './FoodCard';
 import { useNavigate } from 'react-router-dom';
@@ -140,6 +140,80 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
   <FoodCard key={index} data={item}/>
 ))}
 </div>
+      </div>
+
+      <div id="contact-us-section" className='w-full max-w-6xl flex flex-col gap-5 items-start p-[10px] pb-10'>
+        <div className='w-full bg-white rounded-3xl shadow-lg p-6 sm:p-10 space-y-8 border border-gray-100'>
+          <div className='text-center space-y-3'>
+            <h2 className='text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight'>Contact Us</h2>
+            <div className='w-24 h-1 bg-[#ff4d2d] mx-auto rounded-full'></div>
+            <p className='text-gray-500 text-base sm:text-lg'>We would love to hear from you! Reach out to us through any of the channels below.</p>
+          </div>
+          
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mt-6'>
+            <div className='space-y-4 sm:space-y-6'>
+              
+              <a href="https://wa.me/917350484629?text=Hi,%20I%20would%20like%20to%20know%20more%20about%20your%20services!" target='_blank' rel='noopener noreferrer' className='flex items-center gap-4 p-4 sm:p-5 rounded-2xl border border-green-200 bg-green-50 hover:bg-green-100 transition group'>
+                <div className='bg-green-500 p-3 rounded-full text-white shadow-md group-hover:scale-110 transition-transform shrink-0'>
+                  <FaWhatsapp size={24} />
+                </div>
+                <div>
+                  <h3 className='font-bold text-gray-800 text-lg'>WhatsApp Us</h3>
+                  <p className='text-gray-600 text-sm'>+91 73504 84629</p>
+                </div>
+              </a>
+
+              <div className='flex items-center gap-4 p-4 sm:p-5 rounded-2xl border border-gray-100 bg-gray-50'>
+                <div className='bg-blue-500 p-3 rounded-full text-white shadow-md shrink-0'>
+                  <FaPhone size={24} />
+                </div>
+                <div>
+                  <h3 className='font-bold text-gray-800 text-lg'>Call Us</h3>
+                  <p className='text-gray-600 text-sm'>+91 73504 84629</p>
+                </div>
+              </div>
+
+              <div className='flex items-center gap-4 p-4 sm:p-5 rounded-2xl border border-gray-100 bg-gray-50'>
+                <div className='bg-purple-500 p-3 rounded-full text-white shadow-md shrink-0'>
+                  <FaEnvelope size={24} />
+                </div>
+                <div>
+                  <h3 className='font-bold text-gray-800 text-lg'>Email Us</h3>
+                  <p className='text-gray-600 text-sm break-all'>support@hometownkitchen.com</p>
+                </div>
+              </div>
+
+              <div className='flex items-center gap-4 p-4 sm:p-5 rounded-2xl border border-gray-100 bg-gray-50'>
+                <div className='bg-red-500 p-3 rounded-full text-white shadow-md shrink-0'>
+                  <FaMapMarkerAlt size={24} />
+                </div>
+                <div>
+                  <h3 className='font-bold text-gray-800 text-lg'>Our Location</h3>
+                  <p className='text-gray-600 text-sm'>The Hometown Kitchen n cafe Restaurant</p>
+                </div>
+              </div>
+
+            </div>
+
+            <div className='bg-gray-50 p-6 rounded-2xl border border-gray-100'>
+              <h3 className='text-2xl font-bold text-gray-800 mb-6'>Send us a Message</h3>
+              <form className='space-y-4' onSubmit={(e) => { e.preventDefault(); window.open("https://wa.me/917350484629?text=Hi,%20I%20would%20like%20to%20know%20more%20about%20your%20services!", '_blank'); }}>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>Your Name</label>
+                  <input type='text' className='w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:border-[#ff4d2d] focus:ring-1 focus:ring-[#ff4d2d] transition bg-white' placeholder='John Doe' />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>Message</label>
+                  <textarea rows={4} className='w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:border-[#ff4d2d] focus:ring-1 focus:ring-[#ff4d2d] transition bg-white' placeholder='How can we help you?'></textarea>
+                </div>
+                <button type='submit' className='w-full bg-[#ff4d2d] hover:bg-[#e64526] text-white py-3 rounded-xl font-bold transition shadow-md flex items-center justify-center gap-2'>
+                  <FaWhatsapp size={20} />
+                  Send via WhatsApp
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className='w-full bg-white mt-auto py-12 border-t border-gray-200 flex flex-col items-center justify-center gap-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]'>

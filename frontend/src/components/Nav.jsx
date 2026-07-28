@@ -113,7 +113,15 @@ handleSearchItems()
                         <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={()=>navigate("/about")}>
                             About
                         </button>
-                        <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={()=>navigate("/contact")}>
+                        <button className='font-semibold text-gray-700 hover:text-[#ff4d2d] transition' onClick={() => {
+                            if (window.location.pathname === "/") {
+                                const elem = document.getElementById("contact-us-section");
+                                if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+                                else navigate("/contact");
+                            } else {
+                                navigate("/contact");
+                            }
+                        }}>
                             Contact
                         </button>
                     </div>
