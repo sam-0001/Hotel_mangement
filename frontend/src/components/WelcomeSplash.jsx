@@ -31,13 +31,13 @@ function WelcomeSplash({ onFinish }) {
       <div className="absolute w-72 h-72 bg-[#ff4d2d]/20 rounded-full blur-3xl animate-pulse"></div>
       
       <div className="relative z-10 flex flex-col items-center px-6 text-center space-y-6 animate-fade-in-up">
-        {/* Logo Container with glowing ring animation */}
-        <div className="relative flex items-center justify-center p-4 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-2xl transform hover:scale-105 transition-transform duration-300">
-          <div className="absolute inset-0 rounded-3xl border-2 border-[#ff4d2d]/60 animate-ping"></div>
+        {/* Square & Bigger Logo Container */}
+        <div className="relative flex items-center justify-center p-6 bg-white/10 backdrop-blur-md rounded-2xl border-2 border-white/30 shadow-2xl w-44 h-44 sm:w-60 sm:h-60 aspect-square transform hover:scale-105 transition-transform duration-300">
+          <div className="absolute inset-0 rounded-2xl border-2 border-[#ff4d2d]/60 animate-ping"></div>
           <img
             src={logo}
             alt="The Hometown Kitchen n cafe Restaurant Logo"
-            className="h-28 sm:h-36 w-auto object-contain drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
+            className="w-full h-full object-contain drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] p-2"
           />
         </div>
 

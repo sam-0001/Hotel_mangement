@@ -45,6 +45,7 @@ function EditItem() {
         try {
             const formData = new FormData()
             formData.append("name",name)
+            formData.append("description",description)
             formData.append("category",category)
             formData.append("foodType", foodType)
             formData.append("price", price)
@@ -76,6 +77,7 @@ function EditItem() {
 
     useEffect(()=>{
      setName(currentItem?.name || "")
+     setDescription(currentItem?.description || "")
      setPrice(currentItem?.price || 0)
      setCategory(currentItem?.category || "")
      setFoodType(currentItem?.foodType || "")
@@ -111,6 +113,13 @@ function EditItem() {
                             <img src={frontendImage} alt="" className='w-full h-48 object-cover rounded-lg border' />
                         </div>}
 
+                    </div>
+                    <div>
+                        <label className='block text-sm font-medium text-gray-700 mb-1'>Description</label>
+                        <textarea placeholder='Enter Food Description / Ingredients...' rows={3} className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500'
+                            onChange={(e) => setDescription(e.target.value)}
+                            value={description}
+                        />
                     </div>
                     <div>
                         <label className='block text-sm font-medium text-gray-700 mb-1'>Price</label>

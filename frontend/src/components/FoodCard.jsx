@@ -61,8 +61,13 @@ const handleDecrease=()=>{
 
       <div className="flex-1 flex flex-col p-4">
         <h1 className='font-semibold text-gray-900 text-base truncate'>{data.name}</h1>
+        {data.description && (
+          <p className='text-xs text-gray-500 line-clamp-2 mt-1 italic' title={data.description}>
+            {data.description}
+          </p>
+        )}
 
-        <div className='flex items-center gap-1 mt-1'>
+        <div className='flex items-center gap-1 mt-2'>
         {renderStars(data.rating?.average || 0)}
         <span className='text-xs text-gray-500 ml-1'>
             {(data.rating?.average || 0).toFixed(1)} / 5 ({data.rating?.count || 0} reviews)
