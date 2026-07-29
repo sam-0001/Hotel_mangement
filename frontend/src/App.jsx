@@ -60,18 +60,17 @@ useUpdateLocation()
 
 
 
-  if (isAuthChecking) {
-      return (
-          <div className="flex h-screen items-center justify-center bg-[#fff9f6]">
-              <ClipLoader color="#ff4d2d" size={50} />
-          </div>
-      )
-  }
-
   return (
     <>
       {showSplash && <WelcomeSplash onFinish={() => setShowSplash(false)} />}
-      <Routes>
+
+      {isAuthChecking ? (
+        <div className="flex h-screen items-center justify-center bg-[#fff9f6]">
+          <ClipLoader color="#ff4d2d" size={50} />
+        </div>
+      ) : (
+        <>
+          <Routes>
     <Route path='/signup' element={!userData?<SignUp role="user"/>:<Navigate to={"/"}/>}/>
     <Route path='/owner' element={!userData?<SignUp role="owner"/>:<Navigate to={"/"}/>}/>
     <Route path='/rider' element={!userData?<SignUp role="deliveryBoy"/>:<Navigate to={"/"}/>}/>
@@ -94,10 +93,12 @@ useUpdateLocation()
 <Route path='/owner/table-bookings' element={userData?.role==='owner'?<OwnerTableBookings/>:<Navigate to={"/"}/>}/>
 <Route path='/owner/halls' element={userData?.role==='owner'?<OwnerHallManagement/>:<Navigate to={"/"}/>}/>
 <Route path='/owner/hall-bookings' element={userData?.role==='owner'?<OwnerHallBookings/>:<Navigate to={"/"}/>}/>
-<Route path='/about' element={<AboutUs/>}/>
-<Route path='/contact' element={<ContactUs/>}/>
+    <Route path='/about' element={<AboutUs/>}/>
+    <Route path='/contact' element={<ContactUs/>}/>
    </Routes>
       <CartBottomBar />
+     </>
+    )}
   </>
   )
 }
