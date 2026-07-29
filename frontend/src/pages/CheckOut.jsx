@@ -283,9 +283,10 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
             <TableBookingModal 
                 shopId={cartItems[0]?.shop?._id || cartItems[0]?.shop} 
                 onClose={() => setShowBookingModal(false)} 
+                disableWhatsApp={true}
                 onSuccess={(booking) => {
                     setIsTableBooked(true);
-                    const info = { shopId: booking.shop, bookingId: booking._id };
+                    const info = { shopId: booking.shop, bookingId: booking._id, tableId: booking.table?._id || booking.table };
                     localStorage.setItem('dineInTable', JSON.stringify(info));
                     setDineInInfo(info);
                 }} 

@@ -4,7 +4,7 @@ import { serverUrl } from '../App';
 import { RxCross2 } from "react-icons/rx";
 import { useSelector } from 'react-redux';
 
-function TableBookingModal({ shopId, onClose, onSuccess }) {
+function TableBookingModal({ shopId, onClose, onSuccess, disableWhatsApp = false }) {
     const { userData } = useSelector((state) => state.user);
     
     const [date, setDate] = useState("");
@@ -26,7 +26,7 @@ function TableBookingModal({ shopId, onClose, onSuccess }) {
         setLoading(true);
         setErrorMessage("");
         
-        const useWhatsAppFlow = true; // Set to false to disable WhatsApp redirection
+        const useWhatsAppFlow = !disableWhatsApp; // Controlled by prop
 
         try {
             const result = await axios.post(`${serverUrl}/api/table-booking/book`, {
