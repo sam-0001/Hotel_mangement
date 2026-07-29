@@ -83,22 +83,40 @@ function UserTableBookingCard({ booking }) {
                     </div>
 
                     <div className='space-y-2'>
-                        {booking.foodOrders.map((shopOrder, idx) => (
-                            <div key={idx} className='text-sm text-gray-700 bg-white/80 p-2.5 rounded-lg border border-orange-100'>
-                                <div className='flex justify-between font-semibold text-xs text-gray-500 mb-1'>
-                                    <span>Order #{idx + 1}</span>
-                                    <span>Subtotal: ₹{shopOrder.subtotal}</span>
+                    <div className='space-y-2'>
+                        {(() => {
+                            const aggregatedItems = {};
+                            booking.foodOrders.forEach(shopOrder => {
+                                shopOrder.shopOrderItems?.forEach(item => {
+                                    if (aggregatedItems[item._id]) {
+                                        aggregatedItems[item._id].quantity += item.quantity;
+                                    } else {
+                                        aggregatedItems[item._id] = { ...item };
+                                    }
+                                });
+                            });
+                            const finalOrderList = Object.values(aggregatedItems);
+                            
+                            return (
+                                <div className='text-sm text-gray-700 bg-white/80 p-3 rounded-lg border border-orange-100'>
+                                    <div className='flex justify-between font-bold text-xs text-gray-500 mb-2 border-b border-gray-200 pb-1'>
+                                        <span>Item</span>
+                                        <span>Price</span>
+                                    </div>
+                                    <ul className='space-y-2'>
+                                        {finalOrderList.map((item, itemIdx) => (
+                                            <li key={itemIdx} className='flex justify-between items-center text-xs sm:text-sm border-b border-gray-100 last:border-0 pb-1 last:pb-0'>
+                                                <span className='font-medium text-gray-800'>
+                                                    {item.name} <strong className='text-[#ff4d2d] ml-1'>x{item.quantity}</strong>
+                                                </span>
+                                                <span className='font-semibold text-gray-700'>₹{item.price * item.quantity}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
-                                <ul className='space-y-1'>
-                                    {shopOrder.shopOrderItems?.map((item, itemIdx) => (
-                                        <li key={itemIdx} className='flex justify-between items-center text-xs sm:text-sm'>
-                                            <span>{item.name} <strong className='text-gray-500'>x{item.quantity}</strong></span>
-                                            <span className='font-medium text-gray-600'>₹{item.price * item.quantity}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
+                            );
+                        })()}
+                    </div>
                     </div>
                 </div>
             )}

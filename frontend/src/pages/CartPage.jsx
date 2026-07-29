@@ -1,11 +1,47 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { IoIosArrowRoundBack } from "react-icons/io";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CartItemCard from '../components/CartItemCard';
+import axios from 'axios';
+import { serverUrl } from '../App';
+import { addMyOrder, clearCart } from '../redux/userSlice';
+
 function CartPage() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const { cartItems, totalAmount, userData } = useSelector(state => state.user)
+    const [isLoading, setIsLoading] = useState(false)
+    
+    const dineInTableRaw = localStorage.getItem('dineInTable');
+    const dineInInfo = dineInTableRaw ? JSON.parse(dineInTableRaw) : null;
+
+    const handleDineInOrder = async () => {
+        if(isLoading) return;
+        setIsLoading(true);
+        try {
+            const payload = {
+                cartItems,
+                paymentMethod: "cod",
+                totalAmount: totalAmount, // no delivery fee
+                orderType: "dineIn",
+                tableId: dineInInfo.tableId,
+                tableBookingId: dineInInfo.tableBookingId || dineInInfo.bookingId
+            };
+            const result = await axios.post(`${serverUrl}/api/order/place-order`, payload, { withCredentials: true });
+            
+            // Just place the order directly and go to orders page
+            dispatch(addMyOrder(result.data));
+            dispatch(clearCart());
+            navigate("/my-orders");
+        } catch (error) {
+            console.error("Error placing dine-in order:", error);
+            alert("Failed to add items to table. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className='min-h-screen bg-[#fff9f6] flex justify-center p-6'>
             <div className='w-full max-w-[800px]'>
@@ -29,13 +65,21 @@ function CartPage() {
                         <span className='text-xl font-bold text-[#ff4d2d]'>₹{totalAmount}</span>
                     </div>
                     <div className='mt-4 flex justify-end' > 
-                        <button className='bg-[#ff4d2d] text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-[#e64526] transition cursor-pointer' onClick={()=>{
-                            if (!userData) {
-                                navigate("/signin");
-                            } else {
-                                navigate("/checkout");
-                            }
-                        }}>Proceed to CheckOut</button>
+                        <button 
+                            disabled={isLoading}
+                            className='bg-[#ff4d2d] text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-[#e64526] transition cursor-pointer disabled:opacity-70' 
+                            onClick={()=>{
+                                if (!userData) {
+                                    navigate("/signin");
+                                } else if (dineInInfo) {
+                                    handleDineInOrder();
+                                } else {
+                                    navigate("/checkout");
+                                }
+                            }}
+                        >
+                            {isLoading ? "Adding to Table..." : dineInInfo ? "Add to Table Order" : "Proceed to CheckOut"}
+                        </button>
                     </div>
                 </>
                 )}
