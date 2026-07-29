@@ -243,25 +243,39 @@ function OwnerTableBookings() {
                                  {(booking.foodOrders && booking.foodOrders.length > 0) && (
                                     <div className='mt-3 bg-[#fff8f5] p-3.5 rounded-xl text-sm text-gray-800 border border-orange-200 shadow-sm'>
                                         <div className='flex justify-between items-center border-b border-orange-200 pb-2 mb-2'>
-                                            <h4 className='font-bold text-gray-900 flex items-center gap-1.5'>🍲 Table Food Orders ({booking.orderCount || booking.foodOrders.length})</h4>
+                                            <h4 className='font-bold text-gray-900 flex items-center gap-1.5'>🍲 Table Food Orders</h4>
                                             <span className='font-extrabold text-[#ff4d2d] text-base'>Running Total: ₹{booking.totalBill}</span>
                                         </div>
-                                        {booking.foodOrders.map((shopOrder, idx) => (
-                                            <div key={idx} className='mb-2 last:mb-0 bg-white p-2.5 rounded-lg border border-orange-100'>
-                                                <div className='flex justify-between text-xs font-semibold text-gray-500 mb-1'>
-                                                    <span>Order #{idx + 1}</span>
-                                                    <span className='text-[#ff4d2d]'>₹{shopOrder.subtotal}</span>
-                                                </div>
-                                                <ul className='space-y-1'>
-                                                    {shopOrder.shopOrderItems.map((item, itemIdx) => (
-                                                        <li key={itemIdx} className='flex justify-between items-center text-xs text-gray-700'>
-                                                            <span>{item.name}</span>
-                                                            <span className='font-bold px-2 py-0.5 bg-orange-100 text-[#ff4d2d] rounded'>x{item.quantity} (₹{item.price * item.quantity})</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                        <div className='bg-white p-3 rounded-lg border border-orange-100'>
+                                            <div className='flex justify-between font-bold text-xs text-gray-500 mb-2 border-b border-gray-100 pb-1'>
+                                                <span>Item</span>
+                                                <span>Price</span>
                                             </div>
-                                        ))}
+                                            <ul className='space-y-2'>
+                                                {(() => {
+                                                    const aggregatedItems = {};
+                                                    booking.foodOrders.forEach(shopOrder => {
+                                                        shopOrder.shopOrderItems?.forEach(item => {
+                                                            if (aggregatedItems[item.name]) {
+                                                                aggregatedItems[item.name].quantity += item.quantity;
+                                                            } else {
+                                                                aggregatedItems[item.name] = { ...item };
+                                                            }
+                                                        });
+                                                    });
+                                                    const finalOrderList = Object.values(aggregatedItems);
+                                                    
+                                                    return finalOrderList.map((item, itemIdx) => (
+                                                        <li key={itemIdx} className='flex justify-between items-center text-xs sm:text-sm border-b border-gray-50 pb-1 last:border-0 last:pb-0'>
+                                                            <span className='font-medium text-gray-800'>
+                                                                {item.name} <strong className='text-[#ff4d2d] ml-1 bg-orange-50 px-1.5 py-0.5 rounded'>x{item.quantity}</strong>
+                                                            </span>
+                                                            <span className='font-semibold text-gray-700'>₹{item.price * item.quantity}</span>
+                                                        </li>
+                                                    ));
+                                                })()}
+                                            </ul>
+                                        </div>
                                     </div>
                                 )}
                             </div>
