@@ -129,7 +129,7 @@ function CheckOut() {
 
       if (orderType === "dineIn" && dineInInfo) {
           payload.tableId = dineInInfo.tableId;
-          payload.tableBookingId = dineInInfo.bookingId;
+          payload.tableBookingId = dineInInfo.tableBookingId || dineInInfo.bookingId;
       } else if (orderType === "delivery") {
           payload.deliveryAddress = {
             text:addressInput,

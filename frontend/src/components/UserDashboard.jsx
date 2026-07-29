@@ -105,13 +105,14 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
             </div>
             <button className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow hover:bg-blue-700 transition">Book Hall</button>
           </div>
+        <div id="gallery-section" className='w-full max-w-6xl px-[10px] my-2'>
+          <GallerySection />
         </div>
 
-        <h1 className='text-gray-800 text-2xl sm:text-3xl font-bold'>Inspiration for your first order</h1>
+        <h1 className='text-gray-800 text-2xl sm:text-3xl font-bold mt-4'>Inspiration for your first order</h1>
         <div className='w-full relative'>
           {showLeftCateButton &&  <button className='absolute left-0 top-1/2 -translate-y-1/2 bg-[#ff4d2d] text-white p-2 rounded-full shadow-lg hover:bg-[#e64528] z-10' onClick={()=>scrollHandler(cateScrollRef,"left")}><FaCircleChevronLeft />
           </button>}
-         
 
           <div className='w-full flex overflow-x-auto gap-4 pb-2 ' ref={cateScrollRef}>
             {categories.map((cate, index) => (
@@ -119,17 +120,10 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
             ))}
           </div>
           {showRightCateButton &&  <button className='absolute right-0 top-1/2 -translate-y-1/2 bg-[#ff4d2d] text-white p-2 rounded-full shadow-lg hover:bg-[#e64528] z-10' onClick={()=>scrollHandler(cateScrollRef,"right")}>
-<FaCircleChevronRight />
+            <FaCircleChevronRight />
           </button>}
-         
         </div>
       </div>
-
-      <div id="gallery-section" className='w-full max-w-6xl px-[10px]'>
-        <GallerySection />
-      </div>
-
-      <div className='w-full max-w-6xl flex flex-col gap-5 items-start p-[10px] pb-10'>
        <h1 className='text-gray-800 text-2xl sm:text-3xl font-bold'>
         Suggested Food Items
        </h1>
