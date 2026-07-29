@@ -156,7 +156,7 @@ function CheckOut() {
           
           let fullMessage = `*New Order!*\n\n${customerInfo}\n\n${orderDetails}\n*Items*\n${itemsText}\n\n${billDetails}`;
 
-          const ownerMobile = cartItems[0]?.shop?.owner?.mobile || cartItems[0]?.shop?.mobile || "917350484629"; 
+          const ownerMobile = cartItems[0]?.shop?.owner?.mobile || cartItems[0]?.shop?.mobile || "918329262472"; 
           
           const whatsappUrl = `https://wa.me/${ownerMobile}?text=${encodeURIComponent(fullMessage)}`;
           window.open(whatsappUrl, "_blank");

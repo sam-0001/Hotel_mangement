@@ -152,7 +152,7 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mt-6'>
             <div className='space-y-4 sm:space-y-6'>
               
-              <a href="https://wa.me/917350484629?text=Hi,%20I%20would%20like%20to%20know%20more%20about%20your%20services!" target='_blank' rel='noopener noreferrer' className='flex items-center gap-4 p-4 sm:p-5 rounded-2xl border border-green-200 bg-green-50 hover:bg-green-100 transition group'>
+              <a href="https://wa.me/918329262472?text=Hi,%20I%20would%20like%20to%20know%20more%20about%20your%20services!" target='_blank' rel='noopener noreferrer' className='flex items-center gap-4 p-4 sm:p-5 rounded-2xl border border-green-200 bg-green-50 hover:bg-green-100 transition group'>
                 <div className='bg-green-500 p-3 rounded-full text-white shadow-md group-hover:scale-110 transition-transform shrink-0'>
                   <FaWhatsapp size={24} />
                 </div>
@@ -178,7 +178,7 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
                 </div>
                 <div>
                   <h3 className='font-bold text-gray-800 text-lg'>Email Us</h3>
-                  <p className='text-gray-600 text-sm break-all'>support@hometownkitchen.com</p>
+                  <p className='text-gray-600 text-sm break-all'>thehometowncafenrestaurant@gmail.com</p>
                 </div>
               </div>
 
@@ -196,7 +196,7 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
 
             <div className='bg-gray-50 p-6 rounded-2xl border border-gray-100'>
               <h3 className='text-2xl font-bold text-gray-800 mb-6'>Send us a Message</h3>
-              <form className='space-y-4' onSubmit={(e) => { e.preventDefault(); window.open("https://wa.me/917350484629?text=Hi,%20I%20would%20like%20to%20know%20more%20about%20your%20services!", '_blank'); }}>
+              <form className='space-y-4' onSubmit={(e) => { e.preventDefault(); window.open("https://wa.me/918329262472?text=Hi,%20I%20would%20like%20to%20know%20more%20about%20your%20services!", '_blank'); }}>
                 <div>
                   <label className='block text-sm font-medium text-gray-700 mb-1'>Your Name</label>
                   <input type='text' className='w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:border-[#ff4d2d] focus:ring-1 focus:ring-[#ff4d2d] transition bg-white' placeholder='John Doe' />

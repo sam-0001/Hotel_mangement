@@ -3,7 +3,7 @@ import Nav from '../components/Nav';
 import { FaWhatsapp, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 
 function ContactUs() {
-  const whatsappNumber = "917350484629";
+  const whatsappNumber = "918329262472";
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=Hi,%20I%20would%20like%20to%20know%20more%20about%20your%20services!`;
 
   return (
@@ -26,7 +26,7 @@ function ContactUs() {
                 </div>
                 <div>
                   <h3 className='font-bold text-gray-800 text-lg'>WhatsApp Us</h3>
-                  <p className='text-gray-600 text-sm'>+91 73504 84629</p>
+                  <p className='text-gray-600 text-sm'>+91 83292 62472</p>
                 </div>
               </a>
 
@@ -36,7 +36,7 @@ function ContactUs() {
                 </div>
                 <div>
                   <h3 className='font-bold text-gray-800 text-lg'>Call Us</h3>
-                  <p className='text-gray-600 text-sm'>+91 73504 84629</p>
+                  <p className='text-gray-600 text-sm'>+91 83292 62472</p>
                 </div>
               </div>
 
@@ -46,7 +46,7 @@ function ContactUs() {
                 </div>
                 <div>
                   <h3 className='font-bold text-gray-800 text-lg'>Email Us</h3>
-                  <p className='text-gray-600 text-sm break-all'>support@hometownkitchen.com</p>
+                  <p className='text-gray-600 text-sm break-all'>thehometowncafenrestaurant@gmail.com</p>
                 </div>
               </div>
 
