@@ -135,6 +135,7 @@ export const placeOrderAsOwner = async (req, res) => {
             paymentMethod: 'cod',
             orderType: "dineIn",
             tableId,
+            tableBookingId,
             totalAmount,
             shopOrders,
             payment: false
