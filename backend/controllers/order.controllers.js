@@ -26,6 +26,15 @@ export const placeOrder = async (req, res) => {
             if (!deliveryAddress || !deliveryAddress.text || !deliveryAddress.latitude || !deliveryAddress.longitude) {
                 return res.status(400).json({ message: "send complete deliveryAddress" })
             }
+        } else if (tableBookingId) {
+            // Verify booking is still active
+            const booking = await TableBooking.findById(tableBookingId);
+            if (!booking) {
+                return res.status(400).json({ message: "Table booking not found. Please scan the QR or book a table again." })
+            }
+            if (['Completed', 'Cancelled', 'No-Show'].includes(booking.status)) {
+                return res.status(400).json({ message: "BOOKING_CLOSED", description: "This table booking has already been closed or completed." })
+            }
         }
 
         const groupItemsByShop = {}

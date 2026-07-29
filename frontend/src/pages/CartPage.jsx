@@ -36,7 +36,13 @@ function CartPage() {
             navigate("/my-orders");
         } catch (error) {
             console.error("Error placing dine-in order:", error);
-            alert("Failed to add items to table. Please try again.");
+            if (error.response?.data?.message === "BOOKING_CLOSED") {
+                alert("Your previous table booking has been completed or closed. Please scan the QR code to book a new table if you are still dining in.");
+                localStorage.removeItem('dineInTable');
+                navigate("/");
+            } else {
+                alert(error.response?.data?.message || "Failed to add items to table. Please try again.");
+            }
         } finally {
             setIsLoading(false);
         }
