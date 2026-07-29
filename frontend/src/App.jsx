@@ -62,7 +62,7 @@ useUpdateLocation()
 
   return (
     <>
-      {showSplash && <WelcomeSplash onFinish={() => setShowSplash(false)} />}
+      {showSplash && userData?.role !== 'owner' && <WelcomeSplash onFinish={() => setShowSplash(false)} />}
 
       {isAuthChecking ? (
         <div className="flex h-screen items-center justify-center bg-[#fff9f6]">
