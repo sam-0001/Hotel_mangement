@@ -72,6 +72,7 @@ export const createOnlineBooking = async (req, res) => {
         });
 
         await newBooking.save();
+        await newBooking.populate('table');
 
         res.status(201).json({ message: "Table booked and automatically assigned successfully", booking: newBooking });
     } catch (error) {

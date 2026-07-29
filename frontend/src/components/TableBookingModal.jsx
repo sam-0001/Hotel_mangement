@@ -32,7 +32,8 @@ function TableBookingModal({ shopId, onClose, onSuccess }) {
             
             if (useWhatsAppFlow) {
                try {
-                   let message = `*New Table Booking!*\n\n*Customer Info*\nName: ${customerName}\nMobile: ${customerMobile}\n\n*Booking Details*\nDate: ${date}\nTime: ${time}\nGuests: ${guests}\nPreference: ${preference}\nSmoking: ${smoking ? 'Yes' : 'No'}\nOccasion: ${specialOccasion || 'None'}\nRequest: ${specialRequest || 'None'}`;
+                   const assignedTable = result.data.booking?.table?.tableNumber || "Auto-assigned";
+                   let message = `*New Table Booking!*\n\n*Customer Info*\nName: ${customerName}\nMobile: ${customerMobile}\n\n*Booking Details*\nDate: ${date}\nTime: ${time}\nGuests: ${guests}\nPreference: ${preference}\nSmoking: ${smoking ? 'Yes' : 'No'}\nOccasion: ${specialOccasion || 'None'}\nRequest: ${specialRequest || 'None'}\n*Assigned Table:* ${assignedTable}`;
                    
                    const ownerMobile = "917350484629"; 
                    const whatsappUrl = `https://wa.me/${ownerMobile}?text=${encodeURIComponent(message)}`;
