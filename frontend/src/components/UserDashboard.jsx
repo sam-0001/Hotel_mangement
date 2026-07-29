@@ -10,6 +10,7 @@ import FoodCard from './FoodCard';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { serverUrl } from '../App';
+import GallerySection from './GallerySection';
 
 function UserDashboard() {
   const {currentCity,shopInMyCity,itemsInMyCity,searchItems}=useSelector(state=>state.user)
@@ -124,7 +125,9 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
         </div>
       </div>
 
-
+      <div id="gallery-section" className='w-full max-w-6xl px-[10px]'>
+        <GallerySection />
+      </div>
 
       <div className='w-full max-w-6xl flex flex-col gap-5 items-start p-[10px] pb-10'>
        <h1 className='text-gray-800 text-2xl sm:text-3xl font-bold'>

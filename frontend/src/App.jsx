@@ -31,10 +31,11 @@ import OwnerHallManagement from './pages/OwnerHallManagement'
 import OwnerHallBookings from './pages/OwnerHallBookings'
 import AboutUs from './pages/AboutUs'
 import ContactUs from './pages/ContactUs'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { ClipLoader } from 'react-spinners'
 import CartBottomBar from './components/CartBottomBar'
+import WelcomeSplash from './components/WelcomeSplash'
 import axios from 'axios';
 
 export const serverUrl = import.meta.env.VITE_SERVER_URL || "https://hotel-mangement-tewc.onrender.com"
@@ -46,6 +47,7 @@ if (savedToken) {
 
 function App() {
     const {userData, isAuthChecking}=useSelector(state=>state.user)
+    const [showSplash, setShowSplash] = useState(true);
     const dispatch=useDispatch()
   useGetCurrentUser()
 useUpdateLocation()
@@ -68,6 +70,7 @@ useUpdateLocation()
 
   return (
     <>
+      {showSplash && <WelcomeSplash onFinish={() => setShowSplash(false)} />}
       <Routes>
     <Route path='/signup' element={!userData?<SignUp role="user"/>:<Navigate to={"/"}/>}/>
     <Route path='/owner' element={!userData?<SignUp role="owner"/>:<Navigate to={"/"}/>}/>

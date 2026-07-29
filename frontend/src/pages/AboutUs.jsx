@@ -1,11 +1,12 @@
 import React from 'react';
 import Nav from '../components/Nav';
+import GallerySection from '../components/GallerySection';
 
 function AboutUs() {
   return (
-    <div className='min-h-screen bg-[#fff9f6] flex flex-col'>
+    <div className='min-h-screen bg-[#fff9f6] flex flex-col pt-[80px]'>
       <Nav />
-      <div className='flex-1 max-w-5xl mx-auto px-6 py-12'>
+      <div className='flex-1 max-w-5xl mx-auto px-6 py-8 w-full space-y-8'>
         <div className='bg-white rounded-3xl shadow-lg p-10 space-y-8'>
           <div className='text-center space-y-4'>
             <h1 className='text-4xl font-extrabold text-gray-800 tracking-tight'>About Us</h1>
@@ -38,6 +39,10 @@ function AboutUs() {
               <p className='text-sm text-gray-600'>Partnered with only the highest-rated restaurants in your area.</p>
             </div>
           </div>
+        </div>
+
+        <div id="gallery-section">
+          <GallerySection />
         </div>
       </div>
     </div>

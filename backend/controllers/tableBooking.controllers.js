@@ -153,15 +153,17 @@ export const getShopBookings = async (req, res) => {
             createdAt: { $gte: today }
         }).populate("shopOrders.shopOrderItems.item", "name").lean();
 
-        // Initialize foodOrders array for all bookings
+        // Initialize foodOrders array and totalBill for all bookings
         for (let booking of bookings) {
             booking.foodOrders = [];
+            booking.totalBill = 0;
+            booking.orderCount = 0;
         }
 
-        // Attach orders to the best matching booking
+        // Attach orders to the best matching booking and calculate total table bill
         for (let order of activeOrders) {
             const shopOrder = order.shopOrders.find(so => so.shop.toString() === shopId.toString());
-            if (!shopOrder || shopOrder.status === "delivered") continue;
+            if (!shopOrder) continue;
 
             let matchedBooking = null;
 
@@ -186,9 +188,11 @@ export const getShopBookings = async (req, res) => {
                 }
             }
 
-            // Attach to the single best matching booking
+            // Attach to the single best matching booking and sum subtotal
             if (matchedBooking) {
                 matchedBooking.foodOrders.push(shopOrder);
+                matchedBooking.totalBill += (shopOrder.subtotal || 0);
+                matchedBooking.orderCount += 1;
             }
         }
 
@@ -198,10 +202,37 @@ export const getShopBookings = async (req, res) => {
     }
 };
 
-// User gets their own bookings
+// User gets their own bookings with running food orders & bill total
 export const getMyBookings = async (req, res) => {
     try {
-        const bookings = await TableBooking.find({ user: req.userId }).populate("shop", "name image").populate("table").sort({ createdAt: -1 });
+        const bookings = await TableBooking.find({ user: req.userId }).populate("shop", "name image address").populate("table").sort({ createdAt: -1 }).lean();
+        
+        const activeOrders = await Order.find({
+            user: req.userId,
+            orderType: "dineIn"
+        }).populate("shopOrders.shopOrderItems.item", "name").lean();
+
+        for (let booking of bookings) {
+            booking.foodOrders = [];
+            booking.totalBill = 0;
+        }
+
+        for (let order of activeOrders) {
+            let matchedBooking = null;
+            if (order.tableBookingId) {
+                matchedBooking = bookings.find(b => b._id.toString() === order.tableBookingId.toString());
+            }
+            if (!matchedBooking && order.tableId) {
+                matchedBooking = bookings.find(b => b.table && b.table._id.toString() === order.tableId.toString() && (b.status === "Arrived" || b.status === "Confirmed"));
+            }
+            if (matchedBooking) {
+                for (let shopOrder of order.shopOrders) {
+                    matchedBooking.foodOrders.push(shopOrder);
+                    matchedBooking.totalBill += (shopOrder.subtotal || 0);
+                }
+            }
+        }
+
         res.status(200).json(bookings);
     } catch (error) {
         res.status(500).json({ message: `Error fetching your bookings: ${error.message}` });

@@ -240,16 +240,23 @@ function OwnerTableBookings() {
                                     </div>
                                 )}
 
-                                {(booking.foodOrders && booking.foodOrders.length > 0) && (
-                                    <div className='mt-3 bg-blue-50 p-3 rounded-lg text-sm text-blue-800 border border-blue-100'>
-                                        <h4 className='font-bold mb-2 text-blue-900 border-b border-blue-200 pb-1'>🍲 Pre-Ordered Food:</h4>
+                                 {(booking.foodOrders && booking.foodOrders.length > 0) && (
+                                    <div className='mt-3 bg-[#fff8f5] p-3.5 rounded-xl text-sm text-gray-800 border border-orange-200 shadow-sm'>
+                                        <div className='flex justify-between items-center border-b border-orange-200 pb-2 mb-2'>
+                                            <h4 className='font-bold text-gray-900 flex items-center gap-1.5'>🍲 Table Food Orders ({booking.orderCount || booking.foodOrders.length})</h4>
+                                            <span className='font-extrabold text-[#ff4d2d] text-base'>Running Total: ₹{booking.totalBill}</span>
+                                        </div>
                                         {booking.foodOrders.map((shopOrder, idx) => (
-                                            <div key={idx} className='mb-2 last:mb-0'>
-                                                <ul className='list-disc list-inside space-y-1'>
+                                            <div key={idx} className='mb-2 last:mb-0 bg-white p-2.5 rounded-lg border border-orange-100'>
+                                                <div className='flex justify-between text-xs font-semibold text-gray-500 mb-1'>
+                                                    <span>Order #{idx + 1}</span>
+                                                    <span className='text-[#ff4d2d]'>₹{shopOrder.subtotal}</span>
+                                                </div>
+                                                <ul className='space-y-1'>
                                                     {shopOrder.shopOrderItems.map((item, itemIdx) => (
-                                                        <li key={itemIdx} className='flex justify-between items-center text-blue-900'>
+                                                        <li key={itemIdx} className='flex justify-between items-center text-xs text-gray-700'>
                                                             <span>{item.name}</span>
-                                                            <span className='font-bold px-2 py-0.5 bg-blue-100 rounded text-xs'>x{item.quantity}</span>
+                                                            <span className='font-bold px-2 py-0.5 bg-orange-100 text-[#ff4d2d] rounded'>x{item.quantity} (₹{item.price * item.quantity})</span>
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -259,18 +266,26 @@ function OwnerTableBookings() {
                                 )}
                             </div>
 
-                            <div className='flex flex-col gap-3 min-w-[200px] w-full md:w-auto bg-gray-50 p-4 rounded-xl'>
-                                <div className='text-sm font-bold text-gray-700 mb-2 flex justify-between items-center'>
-                                    <span>Table: <span className='text-[#ff4d2d] text-lg'>{booking.table ? booking.table.tableNumber : "None"}</span></span>
+                            <div className='flex flex-col gap-3 min-w-[220px] w-full md:w-auto bg-gray-50 p-4 rounded-xl border border-gray-200/60'>
+                                <div className='text-sm font-bold text-gray-700 mb-1 flex justify-between items-center'>
+                                    <span>Table: <span className='text-[#ff4d2d] text-lg font-black'>{booking.table ? booking.table.tableNumber : "None"}</span></span>
                                 </div>
-                                <div className='flex flex-col gap-2'>
+                                
+                                {/* Live running bill tag for owner */}
+                                {booking.totalBill > 0 && (
+                                    <div className='bg-orange-100 text-orange-900 px-3 py-1.5 rounded-lg text-center font-extrabold text-sm border border-orange-200'>
+                                        Table Bill: ₹{booking.totalBill}
+                                    </div>
+                                )}
+
+                                <div className='flex flex-col gap-2 mt-1'>
                                     {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
                                         <>
                                             <button 
                                                 onClick={() => updateStatus(booking._id, 'Arrived')} 
-                                                className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded text-sm transition'
+                                                className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded text-sm transition shadow-sm'
                                             >
-                                                Confirm Arrival
+                                                Confirm Arrival & Seat
                                             </button>
                                             <button 
                                                 onClick={() => updateStatus(booking._id, 'Cancelled')} 
@@ -284,21 +299,21 @@ function OwnerTableBookings() {
                                         <>
                                             <button 
                                                 onClick={() => handleAddItemsClick(booking)}
-                                                className='bg-[#ff4d2d] hover:bg-orange-600 text-white font-bold py-2 px-4 rounded text-sm transition flex items-center justify-center gap-2'
+                                                className='bg-[#ff4d2d] hover:bg-orange-600 text-white font-bold py-2 px-4 rounded text-sm transition flex items-center justify-center gap-2 shadow-sm'
                                             >
-                                                <FaPlus /> Add Food
+                                                <FaPlus /> Add Items to Bill
                                             </button>
                                             <button 
                                                 onClick={() => updateStatus(booking._id, 'Completed')} 
-                                                className='bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-sm transition'
+                                                className='bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm transition shadow-sm'
                                             >
-                                                Completed
+                                                Complete Order & Payment (₹{booking.totalBill})
                                             </button>
                                         </>
                                     )}
                                     {(booking.status === 'Completed' || booking.status === 'Cancelled' || booking.status === 'No-Show') && (
                                         <div className={`text-center py-2 px-4 rounded font-bold text-sm ${booking.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                            {booking.status}
+                                            {booking.status === 'Completed' ? `Completed (Bill: ₹${booking.totalBill})` : booking.status}
                                         </div>
                                     )}
                                 </div>

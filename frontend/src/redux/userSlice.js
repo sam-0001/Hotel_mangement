@@ -57,11 +57,15 @@ const userSlice = createSlice({
     },
     addToCart: (state, action) => {
       const cartItem = action.payload
-      const existingItem = state.cartItems.find(i => i.id == cartItem.id)
+      const itemId = cartItem.id || cartItem._id
+      const existingItem = state.cartItems.find(i => (i.id || i._id) == itemId)
       if (existingItem) {
         existingItem.quantity += cartItem.quantity
       } else {
-        state.cartItems.push(cartItem)
+        state.cartItems.push({
+          ...cartItem,
+          id: itemId
+        })
       }
 
       state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
