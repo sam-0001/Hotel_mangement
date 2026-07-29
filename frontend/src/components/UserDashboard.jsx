@@ -105,6 +105,8 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
             </div>
             <button className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow hover:bg-blue-700 transition">Book Hall</button>
           </div>
+        </div>
+        
         <div id="gallery-section" className='w-full max-w-6xl px-[10px] my-2'>
           <GallerySection />
         </div>
@@ -123,7 +125,7 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
             <FaCircleChevronRight />
           </button>}
         </div>
-      </div>
+      
        <h1 className='text-gray-800 text-2xl sm:text-3xl font-bold'>
         Suggested Food Items
        </h1>
