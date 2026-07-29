@@ -225,12 +225,10 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
       <div className='w-full max-w-[900px] bg-white rounded-2xl shadow-xl p-6 space-y-6'>
         <h1 className='text-2xl font-bold text-gray-800'>Checkout</h1>
 
-        {!dineInInfo && (
             <div className='flex items-center gap-4 border p-1 rounded-xl bg-gray-50'>
                 <button className={`flex-1 py-2 font-bold rounded-lg transition ${orderType === "delivery" ? "bg-[#ff4d2d] text-white shadow" : "text-gray-600 hover:bg-gray-200"}`} onClick={() => setOrderType("delivery")}>Delivery</button>
                 <button className={`flex-1 py-2 font-bold rounded-lg transition ${orderType === "dineIn" ? "bg-[#ff4d2d] text-white shadow" : "text-gray-600 hover:bg-gray-200"}`} onClick={() => setOrderType("dineIn")}>Dine-In</button>
             </div>
-        )}
 
         {orderType === "delivery" ? (
           <section>

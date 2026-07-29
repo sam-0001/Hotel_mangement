@@ -70,21 +70,33 @@ function CartPage() {
                         <h1 className='text-lg font-semibold'>Total Amount</h1>
                         <span className='text-xl font-bold text-[#ff4d2d]'>₹{totalAmount}</span>
                     </div>
-                    <div className='mt-4 flex justify-end' > 
+                    <div className='mt-4 flex flex-wrap justify-end gap-3' > 
+                        {dineInInfo && (
+                            <button 
+                                disabled={isLoading}
+                                className='bg-[#ff4d2d] text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-[#e64526] transition cursor-pointer disabled:opacity-70' 
+                                onClick={()=>{
+                                    if (!userData) {
+                                        navigate("/signin");
+                                    } else {
+                                        handleDineInOrder();
+                                    }
+                                }}
+                            >
+                                {isLoading ? "Adding to Table..." : "Add to Table Order"}
+                            </button>
+                        )}
                         <button 
-                            disabled={isLoading}
-                            className='bg-[#ff4d2d] text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-[#e64526] transition cursor-pointer disabled:opacity-70' 
+                            className={`${dineInInfo ? 'bg-white text-[#ff4d2d] border-2 border-[#ff4d2d] hover:bg-orange-50' : 'bg-[#ff4d2d] text-white hover:bg-[#e64526]'} px-6 py-3 rounded-lg text-lg font-medium transition cursor-pointer`} 
                             onClick={()=>{
                                 if (!userData) {
                                     navigate("/signin");
-                                } else if (dineInInfo) {
-                                    handleDineInOrder();
                                 } else {
                                     navigate("/checkout");
                                 }
                             }}
                         >
-                            {isLoading ? "Adding to Table..." : dineInInfo ? "Add to Table Order" : "Proceed to CheckOut"}
+                            Proceed to CheckOut
                         </button>
                     </div>
                 </>
