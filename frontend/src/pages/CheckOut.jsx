@@ -177,7 +177,13 @@ function CheckOut() {
     
     } catch (error) {
       console.log(error)
-      alert(error?.response?.data?.message || "Failed to place order. Please check your inputs or try again.");
+      if (error.response?.data?.message === "BOOKING_CLOSED") {
+          alert("Your previous table booking has been completed or closed. Please scan the QR code to book a new table if you are still dining in.");
+          localStorage.removeItem('dineInTable');
+          navigate("/");
+      } else {
+          alert(error?.response?.data?.message || "Failed to place order. Please check your inputs or try again.");
+      }
     } finally {
       setIsLoading(false);
     }

@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { serverUrl } from '../App';
 import { RxCross2 } from "react-icons/rx";
+import { useSelector } from 'react-redux';
 
 function TableBookingModal({ shopId, onClose, onSuccess }) {
+    const { userData } = useSelector((state) => state.user);
+    
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
     const [guests, setGuests] = useState(2);
@@ -11,8 +14,8 @@ function TableBookingModal({ shopId, onClose, onSuccess }) {
     const [smoking, setSmoking] = useState(false);
     const [specialOccasion, setSpecialOccasion] = useState("");
     const [specialRequest, setSpecialRequest] = useState("");
-    const [customerName, setCustomerName] = useState("");
-    const [customerMobile, setCustomerMobile] = useState("");
+    const [customerName, setCustomerName] = useState(userData?.fullName || "");
+    const [customerMobile, setCustomerMobile] = useState(userData?.mobile || "");
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -108,16 +111,18 @@ function TableBookingModal({ shopId, onClose, onSuccess }) {
                                 </div>
                             </div>
                             
-                            <div className="flex gap-4">
-                                <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-                                    <input type="text" required value={customerName} onChange={(e)=>setCustomerName(e.target.value)} placeholder="John Doe" className="w-full border rounded-lg p-2 outline-none focus:border-[#ff4d2d]" />
+                            {!userData && (
+                                <div className="flex gap-4">
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                                        <input type="text" required value={customerName} onChange={(e)=>setCustomerName(e.target.value)} placeholder="John Doe" className="w-full border rounded-lg p-2 outline-none focus:border-[#ff4d2d]" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Mobile No.</label>
+                                        <input type="text" required value={customerMobile} onChange={(e)=>setCustomerMobile(e.target.value)} placeholder="9876543210" className="w-full border rounded-lg p-2 outline-none focus:border-[#ff4d2d]" />
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Mobile No.</label>
-                                    <input type="text" required value={customerMobile} onChange={(e)=>setCustomerMobile(e.target.value)} placeholder="9876543210" className="w-full border rounded-lg p-2 outline-none focus:border-[#ff4d2d]" />
-                                </div>
-                            </div>
+                            )}
 
                             <div className="flex items-center gap-2 mt-2">
                                 <input type="checkbox" id="smoking" checked={smoking} onChange={(e)=>setSmoking(e.target.checked)} className="w-4 h-4 accent-[#ff4d2d]" />
