@@ -149,7 +149,7 @@ function CheckOut() {
           if (orderType === 'delivery') {
              orderDetails += `Delivery Address: ${addressInput}\nMap Link: https://www.google.com/maps/dir/?api=1&destination=${location?.lat},${location?.lon}\n`;
           } else if (orderType === 'dineIn' && dineInInfo) {
-             orderDetails += `Table ID: ${dineInInfo.tableId}\n`;
+             orderDetails += `Table: ${dineInInfo.tableNumber || dineInInfo.tableId}\n`;
           }
           
           let billDetails = `*Bill Summary*\nSubtotal: ₹${totalAmount}\nDelivery Fee: ${deliveryFee === 0 ? 'Free' : '₹' + deliveryFee}\nTotal: ₹${AmountWithDeliveryFee}`;
@@ -286,7 +286,7 @@ const openRazorpayWindow=(orderId,razorOrder)=>{
                 disableWhatsApp={true}
                 onSuccess={(booking) => {
                     setIsTableBooked(true);
-                    const info = { shopId: booking.shop, bookingId: booking._id, tableId: booking.table?._id || booking.table };
+                    const info = { shopId: booking.shop, bookingId: booking._id, tableId: booking.table?._id || booking.table, tableNumber: booking.table?.tableNumber };
                     localStorage.setItem('dineInTable', JSON.stringify(info));
                     setDineInInfo(info);
                 }} 
