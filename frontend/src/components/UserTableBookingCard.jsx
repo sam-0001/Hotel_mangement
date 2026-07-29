@@ -88,10 +88,10 @@ function UserTableBookingCard({ booking }) {
                             const aggregatedItems = {};
                             booking.foodOrders.forEach(shopOrder => {
                                 shopOrder.shopOrderItems?.forEach(item => {
-                                    if (aggregatedItems[item._id]) {
-                                        aggregatedItems[item._id].quantity += item.quantity;
+                                    if (aggregatedItems[item.name]) {
+                                        aggregatedItems[item.name].quantity += item.quantity;
                                     } else {
-                                        aggregatedItems[item._id] = { ...item };
+                                        aggregatedItems[item.name] = { ...item };
                                     }
                                 });
                             });

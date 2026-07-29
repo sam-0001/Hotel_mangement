@@ -23,7 +23,14 @@ function Shop() {
         if (tableId) {
             localStorage.setItem('dineInTable', JSON.stringify({ shopId, tableId }));
         } else {
-            localStorage.removeItem('dineInTable');
+            // Only clear if the stored shopId doesn't match current shopId
+            const stored = localStorage.getItem('dineInTable');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (parsed.shopId !== shopId) {
+                    localStorage.removeItem('dineInTable');
+                }
+            }
         }
     }, [searchParams, shopId]);
 
@@ -40,6 +47,11 @@ function Shop() {
     useEffect(()=>{
 handleShop()
     },[shopId])
+  
+  const dineInTableRaw = localStorage.getItem('dineInTable');
+  const dineInInfo = dineInTableRaw ? JSON.parse(dineInTableRaw) : null;
+  const isDineInActive = dineInInfo && dineInInfo.shopId === shopId;
+
   return (
     <div className='min-h-screen bg-gray-50'>
         <button className='absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white px-3 py-2 rounded-full shadow-md transition' onClick={()=>navigate("/")}>
@@ -55,15 +67,21 @@ handleShop()
           <FaLocationDot size={22} color='red'/>
              <p className='text-lg font-medium text-gray-200 mt-[10px]'>{shop.address}</p>
              </div>
-              <button onClick={() => {
-                  if (!userData) {
-                      navigate('/signin');
-                  } else {
-                      setShowBookingModal(true);
-                  }
-              }} className='mt-6 flex items-center gap-2 bg-[#ff4d2d] hover:bg-[#e64323] text-white px-6 py-3 rounded-full font-bold shadow-lg transition transform hover:scale-105'>
-                  <FaCalendarAlt /> Book a Table
-              </button>
+             {isDineInActive ? (
+                 <div className='mt-6 inline-flex items-center gap-2 bg-green-500/90 backdrop-blur text-white px-5 py-2.5 rounded-full font-bold shadow-md'>
+                     Table #{dineInInfo.tableName || 'Selected'} - Order Mode
+                 </div>
+             ) : (
+                <button onClick={() => {
+                    if (!userData) {
+                        navigate('/signin');
+                    } else {
+                        setShowBookingModal(true);
+                    }
+                }} className='mt-6 flex items-center gap-2 bg-[#ff4d2d] hover:bg-[#e64323] text-white px-6 py-3 rounded-full font-bold shadow-lg transition transform hover:scale-105'>
+                    <FaCalendarAlt /> Book a Table
+                </button>
+             )}
           </div>
        
         </div>}
