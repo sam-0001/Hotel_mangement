@@ -158,7 +158,7 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
                 </div>
                 <div>
                   <h3 className='font-bold text-gray-800 text-lg'>WhatsApp Us</h3>
-                  <p className='text-gray-600 text-sm'>+91 73504 84629</p>
+                  <p className='text-gray-600 text-sm'>+91 83292 62472</p>
                 </div>
               </a>
 
@@ -168,7 +168,7 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
                 </div>
                 <div>
                   <h3 className='font-bold text-gray-800 text-lg'>Call Us</h3>
-                  <p className='text-gray-600 text-sm'>+91 73504 84629</p>
+                  <p className='text-gray-600 text-sm'>+91 83292 62472</p>
                 </div>
               </div>
 
